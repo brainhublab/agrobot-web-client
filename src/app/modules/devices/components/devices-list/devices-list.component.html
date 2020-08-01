@@ -1,0 +1,22 @@
+<h2 (click)="addDevice()">Devices list</h2>
+<nz-list nzGrid>
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzXXl]="8" [nzXl]="4" [nzLg]="6" [nzMd]="6" [nzSm]="12" [nzXs]="24"
+      *ngFor="let item of devices$ | async">
+      <nz-list-item>
+        <nz-card [nzTitle]="titleTemplate">
+          device desc
+        </nz-card>
+        <ng-template #titleTemplate>
+          <a [routerLink]="['details', item.id]">
+            {{item.title}}
+            <i *ngIf="item.configured" nz-icon nzType="check-circle" nzTheme="twotone" nzTwotoneColor="#52c41a"
+              nz-tooltip nzTooltipTitle="Device is configured"></i>
+            <i *ngIf="!item.configured" nz-icon nzType="exclamation-circle" nzTheme="twotone" nzTwotoneColor="#faad14"
+              nz-tooltip nzTooltipTitle="Warning: device is not configured"></i>
+          </a>
+        </ng-template>
+      </nz-list-item>
+    </div>
+  </div>
+</nz-list>
