@@ -4,7 +4,7 @@ import { NotificationsListComponent } from './components/notifications-list/noti
 
 
 const routes: Routes = [
-  { path: '', component: NotificationsListComponent }
+  { path: 'notifications', component: NotificationsListComponent }
 ];
 
 @NgModule({

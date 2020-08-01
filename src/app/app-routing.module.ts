@@ -13,10 +13,6 @@ const routes: Routes = [
     loadChildren: () => import('./modules/workspace/workspace.module').then(m => m.WorkspaceModule)
   },
   {
-    path: 'notifications',
-    loadChildren: () => import('./modules/notifications/notifications.module').then(m => m.NotificationsModule)
-  },
-  {
     path: '',
     pathMatch: 'full',
     redirectTo: '/dashboard'

@@ -20,6 +20,8 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { SharedModule } from './modules/shared/shared.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @NgModule({
   declarations: [
@@ -29,16 +31,18 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
   imports: [
     BrowserModule,
     DashboardModule,
-    AppRoutingModule,
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
     NgxsModule.forRoot([], {
       developmentMode: !environment.production
     }),
+    NotificationsModule,
+    AppRoutingModule,
     NzGridModule,
     NzMenuModule,
     SharedModule,
+    NzBadgeModule
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent]
