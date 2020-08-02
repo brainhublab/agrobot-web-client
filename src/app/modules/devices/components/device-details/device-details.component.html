@@ -39,7 +39,7 @@
         </p>
         <p>Tweak your configuration:</p>
         {{(device$ | async).configuration | json}}
-
+        <app-device-editor [device]="device$ | async"></app-device-editor>
         <nz-divider></nz-divider>
         <button nz-button nzDanger (click)="removeConfiguration()">Delete configuration</button>
       </div>

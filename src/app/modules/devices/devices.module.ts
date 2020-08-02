@@ -19,9 +19,10 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DeviceDetailsComponent } from './components/device-details/device-details.component';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule } from '@angular/forms';
+import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
 
 @NgModule({
-  declarations: [DevicesListComponent, DeviceDetailsComponent],
+  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent],
   imports: [
     CommonModule,
     FormsModule,
