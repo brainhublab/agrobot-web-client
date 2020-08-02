@@ -12,5 +12,11 @@ export namespace DeviceActions {
 
     constructor(public id: number) { }
   }
+
+  export class Edit {
+    static readonly type = '[DEVICE] Edit';
+
+    constructor(public id: number, public pDevice: Partial<DeviceModel>) { }
+  }
 }
 

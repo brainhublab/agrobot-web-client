@@ -10,18 +10,34 @@ import { NgxsModule } from '@ngxs/store';
 import { DevicesState } from './state/devices.state';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { DeviceDetailsComponent } from './components/device-details/device-details.component';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [DevicesListComponent, DeviceDetailsComponent],
   imports: [
     CommonModule,
+    FormsModule,
     DevicesRoutingModule,
     NzListModule,
     NzGridModule,
     NzCardModule,
     NzIconModule,
+    NzTagModule,
+    NzPageHeaderModule,
+    NzTabsModule,
+    NzButtonModule,
+    NzTypographyModule,
     NzToolTipModule,
+    NzDividerModule,
+    NzSelectModule,
     NgxsModule.forFeature(
       [DevicesState]
     )

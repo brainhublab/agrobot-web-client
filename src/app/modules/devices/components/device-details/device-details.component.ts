@@ -5,6 +5,8 @@ import { DevicesState } from '../../state/devices.state';
 import { map } from 'rxjs/operators';
 import { Device } from '../../models/device.model';
 import { Observable } from 'rxjs';
+import { DeviceActions } from '../../state/devices.actions';
+import { MCUTypes, defaultDeviceConfigurationTemplates } from '../../models/device-configuration.model';
 
 @Component({
   selector: 'app-device-details',
@@ -13,6 +15,14 @@ import { Observable } from 'rxjs';
 })
 export class DeviceDetailsComponent implements OnInit {
   public device$: Observable<Device>;
+
+  private deviceID: number;
+
+  public readonly deviceTemplates = [
+    { name: 'Water level', value: MCUTypes.WATER_LEVEL },
+    { name: 'Nutrition control', value: MCUTypes.NUTRITION_CONTROL },
+    { name: 'Light control', value: MCUTypes.LIGHT_CONTROL },
+  ];
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -23,12 +33,34 @@ export class DeviceDetailsComponent implements OnInit {
     this.route.paramMap.subscribe(pm => {
       const deviceID = pm.get('deviceID');
       if (deviceID) {
+        this.deviceID = parseInt(deviceID);
         this.device$ = this.store.select(DevicesState.getByID)
           .pipe(
-            map(ff => ff(parseInt(deviceID)))
+            map(ff => ff(this.deviceID))
           );
       }
     });
   }
 
+  public onTemplateChange(templateValue: MCUTypes) {
+    const conf = defaultDeviceConfigurationTemplates[templateValue];
+    if (!conf) {
+      alert('Wrong config'); // TODO
+      return;
+    }
+    this.editDevice({ configuration: conf });
+  }
+
+  public removeConfiguration() {
+    this.editDevice({ configuration: null });
+  }
+
+  public editDevice(pDevice: Partial<Device>) {
+    return this.store
+      .dispatch(new DeviceActions.Edit(
+        this.deviceID,
+        pDevice
+      ));
+
+  }
 }

@@ -13,23 +13,29 @@ export class DevicesStateModel {
     devices: [
       {
         id: 0,
-        name: 'Title 1'
+        name: 'Default device name',
+        mac_addr: '3b:6e:82:1c:1f:ca',
+        description: 'first device ever'
       },
       {
         id: 1,
-        name: 'Title 2'
+        name: 'Title 2',
+        mac_addr: 'd6:4e:e8:63:fa:41'
       },
       {
         id: 2,
-        name: 'Title 3'
+        name: 'Title 3',
+        mac_addr: '28:d4:0c:67:0f:4d'
       },
       {
         id: 3,
-        name: 'Title 4'
+        name: 'Title 4',
+        mac_addr: 'b5:47:a5:f3:78:20'
       },
       {
         id: 4,
-        name: 'Title 5'
+        name: 'Title 5',
+        mac_addr: 'bf:1a:5e:5c:52:09'
       },
       {
         id: 5,
@@ -65,6 +71,21 @@ export class DevicesState {
   remove({ getState, patchState }: StateContext<DevicesStateModel>, { id }: DeviceActions.Remove) {
     patchState({
       devices: getState().devices.filter((a, i) => i !== id)
+    });
+  }
+
+  @Action(DeviceActions.Edit)
+  edit({ getState, patchState }: StateContext<DevicesStateModel>, { id, pDevice }: DeviceActions.Edit) {
+    patchState({
+      devices: getState().devices.map(device => {
+        if (device.id === id) {
+          return {
+            ...device,
+            ...pDevice
+          };
+        }
+        return device;
+      })
     });
   }
 

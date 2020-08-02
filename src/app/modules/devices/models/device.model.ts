@@ -5,7 +5,6 @@ export class Device {
   mac_addr?: string;
   name: string;
   description?: string;
-  configured?: boolean;
-  configurationJSON?: DeviceConfiguration;
+  configuration?: DeviceConfiguration;
   subscribers?: Array<string>;
 }
