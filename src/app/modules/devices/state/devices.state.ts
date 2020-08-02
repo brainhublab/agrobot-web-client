@@ -12,28 +12,28 @@ export class DevicesStateModel {
   defaults: {
     devices: [
       {
-        id: '0',
-        title: 'Title 1'
+        id: 0,
+        name: 'Title 1'
       },
       {
-        id: '1',
-        title: 'Title 2'
+        id: 1,
+        name: 'Title 2'
       },
       {
-        id: '2',
-        title: 'Title 3'
+        id: 2,
+        name: 'Title 3'
       },
       {
-        id: '3',
-        title: 'Title 4'
+        id: 3,
+        name: 'Title 4'
       },
       {
-        id: '4',
-        title: 'Title 5'
+        id: 4,
+        name: 'Title 5'
       },
       {
-        id: '5',
-        title: 'Title 6'
+        id: 5,
+        name: 'Title 6'
       }
     ]
   }
@@ -47,8 +47,8 @@ export class DevicesState {
   }
 
   @Selector()
-  static getByIndex(state: DevicesStateModel) {
-    return (id: string) => {
+  static getByID(state: DevicesStateModel) {
+    return (id: number) => {
       return state.devices.find(v => v.id === id);
     };
   }
@@ -58,14 +58,14 @@ export class DevicesState {
     const state = getState();
     patchState({
       devices: [...state.devices, device]
-    })
+    });
   }
 
   @Action(DeviceActions.Remove)
   remove({ getState, patchState }: StateContext<DevicesStateModel>, { id }: DeviceActions.Remove) {
     patchState({
       devices: getState().devices.filter((a, i) => i !== id)
-    })
+    });
   }
 
 }

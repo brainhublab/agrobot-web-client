@@ -23,9 +23,9 @@ export class DeviceDetailsComponent implements OnInit {
     this.route.paramMap.subscribe(pm => {
       const deviceID = pm.get('deviceID');
       if (deviceID) {
-        this.device$ = this.store.select(DevicesState.getByIndex)
+        this.device$ = this.store.select(DevicesState.getByID)
           .pipe(
-            map(ff => ff(deviceID))
+            map(ff => ff(parseInt(deviceID)))
           );
       }
     });

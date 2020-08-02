@@ -9,7 +9,7 @@
         </nz-card>
         <ng-template #titleTemplate>
           <a [routerLink]="['details', item.id]">
-            {{item.title}}
+            {{item.name}}
             <i *ngIf="item.configured" nz-icon nzType="check-circle" nzTheme="twotone" nzTwotoneColor="#52c41a"
               nz-tooltip nzTooltipTitle="Device is configured"></i>
             <i *ngIf="!item.configured" nz-icon nzType="exclamation-circle" nzTheme="twotone" nzTwotoneColor="#faad14"

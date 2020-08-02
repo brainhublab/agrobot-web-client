@@ -19,8 +19,8 @@ export class DevicesListComponent implements OnInit {
 
   addDevice() {
     this.store.dispatch(new DeviceActions.Add({
-      id: Math.round(Math.random() * 10).toString(),
-      title: 'new one',
+      id: Math.round(Math.random() * 10),
+      name: 'new one',
     }));
   }
 
