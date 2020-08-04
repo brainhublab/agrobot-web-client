@@ -19,8 +19,6 @@
     "@angular/platform-browser": "~9.1.11",
     "@angular/platform-browser-dynamic": "~9.1.11",
     "@angular/router": "~9.1.11",
-    "@antv/data-set": "^0.11.4",
-    "@antv/g2": "^4.0.14",
     "@ngxs/store": "^3.6.2",
     "litegraph.js": "^0.7.8",
     "ng-zorro-antd": "^9.3.0",
