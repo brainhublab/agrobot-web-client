@@ -2,7 +2,7 @@
 <app-devices-stats></app-devices-stats>
 
 <h1 nz-typography style="text-align: center;">Sample line chart (Temp)</h1>
-<lib-line-chart></lib-line-chart>
+<lib-line-chart [data]="tempData" [valueFormatter]="tempFormatter"></lib-line-chart>
 
 <h1 nz-typography style="text-align: center;">Sample line chart (Water level)</h1>
-<lib-line-chart></lib-line-chart>
+<lib-line-chart [data]="waterLevelData" [valueFormatter]="waterLevelFormatter"></lib-line-chart>
