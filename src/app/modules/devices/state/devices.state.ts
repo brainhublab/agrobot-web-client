@@ -53,6 +53,11 @@ export class DevicesState {
   }
 
   @Selector()
+  static getConfiguredDevices(state: DevicesStateModel) {
+    return state.devices.filter(v => v?.configuration?.isConfigured);
+  }
+
+  @Selector()
   static getByID(state: DevicesStateModel) {
     return (id: number) => {
       return state.devices.find(v => v.id === id);

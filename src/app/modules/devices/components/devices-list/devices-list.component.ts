@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding } from '@angular/core';
 import { Device } from '../../models/device.model';
 import { Store, Select } from '@ngxs/store';
 import { DeviceActions } from '../../state/devices.actions';

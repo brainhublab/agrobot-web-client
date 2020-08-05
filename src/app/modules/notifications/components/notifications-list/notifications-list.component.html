@@ -1,6 +1,8 @@
-<button nz-button (click)="addNotification()">Add</button>
-<ul class="notifications-list">
-  <li *ngFor="let notification of notifications$ | async">
-    {{notification.title}}: {{notification.description}}
-  </li>
-</ul>
+<div class="page-container">
+  <button nz-button (click)="addNotification()">Add</button>
+  <ul class="notifications-list">
+    <li *ngFor="let notification of notifications$ | async">
+      {{notification.title}}: {{notification.description}}
+    </li>
+  </ul>
+</div>
