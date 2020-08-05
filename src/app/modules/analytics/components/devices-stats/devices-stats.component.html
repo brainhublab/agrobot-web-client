@@ -1,0 +1,25 @@
+<div class="devices">
+  <div nz-row nzType="flex" nzJustify="space-around">
+    <div nz-col>
+      <a href="/">
+        <nz-statistic [nzValue]="(24 | number)!" nzTitle="Configured" [nzValueStyle]="{ color: '#6ab04c' }">
+        </nz-statistic>
+      </a>
+      <nz-statistic [nzValue]="(5 | number)!" nzTitle="Not Configured" [nzValueStyle]="{ color: '#f0932b' }">
+      </nz-statistic>
+
+    </div>
+    <div nz-col>
+      <nz-statistic [nzValue]="(20 | number)!" nzTitle="Active" [nzValueStyle]="{ color: '#6ab04c' }">
+      </nz-statistic>
+      <nz-statistic [nzValue]="(9 | number)!" nzTitle="Inactive" [nzValueStyle]="{ color: '#f0932b' }">
+      </nz-statistic>
+    </div>
+    <div nz-col>
+      <nz-statistic [nzValue]="(22 | number)!" nzTitle="Connected" [nzValueStyle]="{ color: '#6ab04c' }">
+      </nz-statistic>
+      <nz-statistic [nzValue]="(7 | number)!" nzTitle="Offline" [nzValueStyle]="{ color: '#f0932b' }">
+      </nz-statistic>
+    </div>
+  </div>
+</div>
