@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, ElementRef, Input } from '@angular/core';
 
-import { Chart } from '@antv/g2';
+import { Chart, View } from '@antv/g2';
 import { CUSTOM_G2_ACTIONS } from '../../g2/actions/config';
 import DataSet from '@antv/data-set';
 import { drawUniformLine } from '../../g2/utils';
@@ -15,6 +15,7 @@ export type LineChartData = Array<{ timestamp: string, value: number }>;
 })
 export class LineChartComponent implements OnInit, AfterViewInit {
   private chart: Chart;
+  private slider: View;
 
   @Input() maxValue: number = null;
   @Input() minValue: number = null;
@@ -95,6 +96,11 @@ export class LineChartComponent implements OnInit, AfterViewInit {
         },
         follow: false
       }
+    });
+
+    // slider
+    this.slider = this.chart.option('slider', {
+      height: 50,
     });
 
     // render
