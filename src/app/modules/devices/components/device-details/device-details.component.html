@@ -1,51 +1,54 @@
-<nz-page-header nzBackIcon>
-  <nz-page-header-title>{{(device$ | async)?.name}}</nz-page-header-title>
-  <nz-page-header-subtitle>Device</nz-page-header-subtitle>
-  <nz-page-header-extra>
-    <nz-tag *ngIf="(device$ | async).configuration?.isConfigured" nzColor="#52c41a">configured</nz-tag>
-    <nz-tag *ngIf="!(device$ | async).configuration?.isConfigured" nzColor="#faad14">not configured</nz-tag>
-  </nz-page-header-extra>
-  <nz-page-header-content>
-    <div class="content">
+<div class="page-container">
 
-      <div><b>Name:</b>
-        <p nz-typography nzEditable [nzContent]="(device$ | async)?.name"
-          (nzContentChange)="editDevice({name: $event})">
-        </p>
+  <nz-page-header nzBackIcon>
+    <nz-page-header-title>{{(device$ | async)?.name}}</nz-page-header-title>
+    <nz-page-header-subtitle>Device</nz-page-header-subtitle>
+    <nz-page-header-extra>
+      <nz-tag *ngIf="(device$ | async).configuration?.isConfigured" nzColor="#52c41a">configured</nz-tag>
+      <nz-tag *ngIf="!(device$ | async).configuration?.isConfigured" nzColor="#faad14">not configured</nz-tag>
+    </nz-page-header-extra>
+    <nz-page-header-content>
+      <div class="content">
+
+        <div><b>Name:</b>
+          <p nz-typography nzEditable [nzContent]="(device$ | async)?.name"
+            (nzContentChange)="editDevice({name: $event})">
+          </p>
+        </div>
+
+        <div><b>MAC:</b>
+          <p nz-typography nzCopyable [nzContent]="(device$ | async)?.mac_addr"></p>
+        </div>
+
+        <div><b>Description:</b>
+          <p nz-typography nzEditable [nzContent]="(device$ | async)?.description"
+            (nzContentChange)="editDevice({description: $event})"></p>
+        </div>
+        <nz-divider nzText="Configuration"></nz-divider>
+
+        <div *ngIf="!(device$ | async).configuration">
+          <p>Please, select a template for configuration:
+            <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
+              (ngModelChange)="onTemplateChange($event)" [ngModel]="(device$ | async).description">
+              <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTemplates"></nz-option>
+            </nz-select>
+          </p>
+        </div>
+        <div *ngIf="(device$ | async).configuration">
+          <p>This device is using
+            <nz-tag nzColor="#52b01a">{{(device$ | async).configuration.mcuType}}</nz-tag>
+            template.
+          </p>
+          <p>Tweak your configuration:</p>
+          {{(device$ | async).configuration | json}}
+          <app-device-editor [device]="device$ | async"></app-device-editor>
+          <nz-divider></nz-divider>
+          <button nz-button nzDanger (click)="removeConfiguration()">Delete configuration</button>
+        </div>
+
+
+
       </div>
-
-      <div><b>MAC:</b>
-        <p nz-typography nzCopyable [nzContent]="(device$ | async)?.mac_addr"></p>
-      </div>
-
-      <div><b>Description:</b>
-        <p nz-typography nzEditable [nzContent]="(device$ | async)?.description"
-          (nzContentChange)="editDevice({description: $event})"></p>
-      </div>
-      <nz-divider nzText="Configuration"></nz-divider>
-
-      <div *ngIf="!(device$ | async).configuration">
-        <p>Please, select a template for configuration:
-          <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
-            (ngModelChange)="onTemplateChange($event)" [ngModel]="(device$ | async).description">
-            <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTemplates"></nz-option>
-          </nz-select>
-        </p>
-      </div>
-      <div *ngIf="(device$ | async).configuration">
-        <p>This device is using
-          <nz-tag nzColor="#52b01a">{{(device$ | async).configuration.mcuType}}</nz-tag>
-          template.
-        </p>
-        <p>Tweak your configuration:</p>
-        {{(device$ | async).configuration | json}}
-        <app-device-editor [device]="device$ | async"></app-device-editor>
-        <nz-divider></nz-divider>
-        <button nz-button nzDanger (click)="removeConfiguration()">Delete configuration</button>
-      </div>
-
-
-
-    </div>
-  </nz-page-header-content>
-</nz-page-header>
+    </nz-page-header-content>
+  </nz-page-header>
+</div>
