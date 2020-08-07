@@ -3,14 +3,13 @@ import { IInteractionContext } from '@antv/g2/lib/interface';
 import DataRangeFilter from '@antv/g2/lib/interaction/action/data/range-filter';
 
 import { CUSTOM_G2_ACTIONS } from './config';
-import RangeMinFilter from './data/range-min-filter';
 
 function isPointInView(context: IInteractionContext) {
   return context.isInPlot();
 }
 
 // brush horizonal with btn
-registerAction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, RangeMinFilter, { dims: ['x'] });
+registerAction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, DataRangeFilter, { dims: ['x'] });
 
 registerInteraction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, {
   showEnable: [
@@ -44,18 +43,18 @@ registerInteraction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, {
         'tooltip:hide',
       ],
     },
-    // {
-    //   // apply on mouseleave
-    //   trigger: 'mouseleave',
-    //   action: [
-    //     `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:filter`,
-    //     `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:end`,
-    //     'x-rect-mask:end',
-    //     'x-rect-mask:hide',
-    //     'reset-button:show',
-    //     'tooltip:hide',
-    //   ],
-    // },
+    {
+      // apply on mouseleave
+      trigger: 'mouseleave',
+      action: [
+        `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:filter`,
+        `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:end`,
+        'x-rect-mask:end',
+        'x-rect-mask:hide',
+        'reset-button:show',
+        'tooltip:hide',
+      ],
+    },
   ],
   rollback: [
     {
