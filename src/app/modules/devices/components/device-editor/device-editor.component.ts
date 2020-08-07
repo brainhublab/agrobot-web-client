@@ -1,10 +1,15 @@
 import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { LGraph, LiteGraph, LGraphCanvas, } from 'litegraph.js';
 import { Device } from '../../models/device.model';
-import { registerNodes } from './nodes';
-import { MCUTypes, WaterLevelConfig } from '../../models/device-configuration.model';
-import { ThrowStmt } from '@angular/compiler';
+import { deleteNotAllowedNodes, registerDeviceConfigurationNode, getDeviceNodeType } from './nodes';
 
+
+const inputNodeTypesMap = {
+  number: 'basic/const',
+  boolean: 'basic/boolean',
+  [LiteGraph.ACTION]: 'widget/button',
+  string: 'widget/combo',
+};
 
 @Component({
   selector: 'app-device-editor',
@@ -18,8 +23,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   private canvas: LGraphCanvas;
 
   constructor() {
-    registerNodes();
-
+    deleteNotAllowedNodes();
   }
 
   ngOnInit(): void {
@@ -34,37 +38,48 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
 
   private addNodes() {
 
+    const deviceNodeCfg = registerDeviceConfigurationNode(this.device);
 
-    if (this.device.configuration.mcuType === MCUTypes.WATER_LEVEL) {
-      const cfg = this.device.configuration as WaterLevelConfig;
-    } else {
+    const deviceNode = LiteGraph.createNode(getDeviceNodeType(this.device));
+    deviceNode.pos = [350, 200];
+    this.graph.add(deviceNode);
 
-      const nodeConst = LiteGraph.createNode('basic/const');
-      nodeConst.pos = [100, 200];
-      this.graph.add(nodeConst);
-      nodeConst.setValue(4.5);
 
-      const nodeKnob = LiteGraph.createNode('widget/knob');
-      nodeKnob.pos = [100, 400];
-      this.graph.add(nodeKnob);
+    // process inputs
+    deviceNode.inputs?.forEach((inputSlot, idx: number) => {
+      const nodeType = inputNodeTypesMap[inputSlot.type];
+      if (nodeType) {
+        const inputSourceNode = LiteGraph.createNode(nodeType);
+        inputSourceNode.pos = [100, 100 * (idx + 1)];
+        this.graph.add(inputSourceNode);
+        if (nodeType === 'basic/const') {
+          inputSourceNode.setValue(4.5);
+        } else if (nodeType === 'widget/button') {
+          inputSourceNode.size = [150, 50];
+          inputSourceNode.properties.text = inputSlot.name.split(' ').shift();
+        } else if (nodeType === 'widget/combo') {
+          // inputSourceNode.removeOutput(1);
 
-      const nodeWaterLevel = LiteGraph.createNode('hydro/water_level');
-      nodeWaterLevel.pos = [350, 200];
-      this.graph.add(nodeWaterLevel);
+          // inputSourceNode.addProperty('value', 'Z', 'string');
+          // inputSourceNode.inputs.
+          // inputSourceNode.addProperty('values', 'X;Y;Z', 'string');
+        }
 
+        inputSourceNode.connect(0, deviceNode, idx);
+      } else {
+        console.warn('Unhandled slot type: ', inputSlot);
+      }
+    });
+
+    // process outputs
+    deviceNode.outputs?.forEach((outputSlot, idx: number) => {
       const nodeWatch = LiteGraph.createNode('basic/watch');
-      nodeWatch.pos = [700, 200];
+      nodeWatch.pos = [700, 100 * (idx + 1)];
       this.graph.add(nodeWatch);
 
-      const nodeWatch1 = LiteGraph.createNode('basic/watch');
-      nodeWatch1.pos = [700, 400];
-      this.graph.add(nodeWatch1);
+      deviceNode.connect(idx, nodeWatch, 0);
+    });
 
-      nodeConst.connect(0, nodeWaterLevel, 0);
-      nodeKnob.connect(0, nodeWaterLevel, 1);
-      nodeWaterLevel.connect(0, nodeWatch, 0);
-      nodeWaterLevel.connect(2, nodeWatch1, 0);
-    }
     this.graph.start();
   }
 
