@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { LGraph, LiteGraph, LGraphCanvas, } from 'litegraph.js';
 import { Device } from '../../models/device.model';
-import { deleteNotAllowedNodes, registerDeviceConfigurationNode, getDeviceNodeType } from '../../../shared/litegraph/nodes';
+import { NodesManager } from '../../../shared/litegraph/nodes';
 
 
 const inputNodeTypesMap = {
@@ -21,9 +21,16 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   @Input() device: Device;
   private graph: LGraph;
   private canvas: LGraphCanvas;
+  private nodesManager = new NodesManager([
+    'basic/const',
+    'basic/boolean',
+    'basic/watch',
+    'widget/button',
+    'widget/combo',
+  ]);
 
   constructor() {
-    deleteNotAllowedNodes();
+    this.nodesManager.deleteNotAllowedNodes();
   }
 
   ngOnInit(): void {
@@ -38,9 +45,9 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
 
   private addNodes() {
 
-    const deviceNodeCfg = registerDeviceConfigurationNode(this.device);
+    const deviceNodeCfg = this.nodesManager.registerDeviceConfigurationNode(this.device);
 
-    const deviceNode = LiteGraph.createNode(getDeviceNodeType(this.device));
+    const deviceNode = LiteGraph.createNode(this.nodesManager.getDeviceNodeType(this.device));
     deviceNode.pos = [350, 200];
     this.graph.add(deviceNode);
 

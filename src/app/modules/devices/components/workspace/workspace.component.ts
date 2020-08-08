@@ -4,7 +4,7 @@ import { Select } from '@ngxs/store';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
 import { Observable } from 'rxjs';
 import { Device } from 'src/app/modules/devices/models/device.model';
-import { deleteNotAllowedNodes, registerWsDeviceNode } from 'src/app/modules/shared/litegraph/nodes';
+import { NodesManager } from 'src/app/modules/shared/litegraph/nodes';
 
 @Component({
   selector: 'app-workspace',
@@ -14,7 +14,15 @@ import { deleteNotAllowedNodes, registerWsDeviceNode } from 'src/app/modules/sha
 export class WorkspaceComponent implements OnInit, AfterViewInit {
   private graph: LGraph;
   private canvas: LGraphCanvas;
-
+  private nodesManager = new NodesManager(
+    [
+      'basic/const',
+      'basic/boolean',
+      'basic/watch',
+      'widget/button',
+      'widget/combo',
+    ]
+  );
   @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<Device>>;
 
   width = 1024;
@@ -29,7 +37,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
   constructor() { }
 
   ngOnInit(): void {
-    deleteNotAllowedNodes();
+    this.nodesManager.deleteNotAllowedNodes();
   }
 
   ngAfterViewInit() {
@@ -50,7 +58,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
     this.configuredDevices$.subscribe((devices: Array<Device>) => {
       console.log(devices);
       devices?.forEach((d, idx) => {
-        const cfg = registerWsDeviceNode(d);
+        const cfg = this.nodesManager.registerWsDeviceNode(d);
         const deviceNode = LiteGraph.createNode(cfg.type);
         deviceNode.pos = [lastOffset, 200];
         lastOffset += deviceNode.computeSize()[0] + 50;
