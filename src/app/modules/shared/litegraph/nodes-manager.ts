@@ -6,15 +6,21 @@ import { DEVICE_INPUTS_OUTPUTS, GraphPins, NodeExecutor, DeviceTrigger } from '.
 export interface NodeConfig {
   type: string;
   title: string;
+  props: GraphPins;
   inputs: GraphPins;
   outputs: GraphPins;
   executors?: Array<NodeExecutor>;
   triggers?: Array<DeviceTrigger>;
 }
 
-/**
- * Generates litegraph node type
- */
+
+const sourceNodeTypes = {
+  number: 'basic/const',
+  boolean: 'basic/boolean',
+  [LiteGraph.ACTION]: 'widget/button',
+  string: 'widget/combo',
+};
+
 
 
 class NodesManager {
@@ -48,6 +54,7 @@ class NodesManager {
     return {
       type: this.getDeviceNodeType(device),
       title: `${device.name} (${device.configuration.mcuType}, ${device.id})`,
+      props: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].props,
       inputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].in,
       outputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].out,
       executors: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].executors,
@@ -73,13 +80,16 @@ class NodesManager {
     function NodeConstructor() {
 
       cfg.inputs.forEach(i => {
-        if (i.type === 'string') {
-          this.addWidget("combo", i.label, "red", (v) => null, { values: ["red", "green", "blue"] });
-        } else if (i.type === 'number') {
-          this.addWidget("number", i.label, 0.5, function (v) { }, { min: 0, max: 100 });
-        }
-        else {
-          this.addInput(i.name, i.type);
+        this.addInput(i.name, i.type);
+      });
+
+      cfg.props?.forEach(p => {
+        if (p.choises?.length > 0) {
+          this.addWidget('combo', p.label, p.choises[0], (v) => null, { values: p.choises });
+        } else if (p.type === 'number') {
+          this.addWidget('number', p.label, 0.5, function (v) { }, { min: 0, max: 100 });
+        } else {
+          console.warn('Unhandled prop: ', p);
         }
       });
 
@@ -91,7 +101,7 @@ class NodesManager {
 
       cfg.triggers.forEach(t => {
         this.addInput(t.name, LiteGraph.ACTION);
-        this.button = this.addWidget("button", t.name, "Buttos", function (v) { }, {});
+        this.button = this.addWidget('button', t.name, 'Button', function (v) { }, {});
       });
     }
 
@@ -140,6 +150,47 @@ class NodesManager {
 
     // register in the system
     LiteGraph.registerNodeType(cfg.type, NodeConstructor as any);
+  }
+
+  public createSourceNodesForNodeInputs(node: LGraphNode, graph: LGraph) {
+    const startX = node.pos[0];
+    const startY = node.pos[1];
+    const margin = 50;
+
+    let lastY = startY;
+    // process inputs
+    node.inputs?.forEach((inputSlot, idx: number) => {
+      const nodeType = sourceNodeTypes[inputSlot.type];
+      if (nodeType) {
+        const inputSourceNode = LiteGraph.createNode(nodeType);
+
+        graph.add(inputSourceNode);
+        if (nodeType === 'basic/const') {
+          inputSourceNode.setValue(4.5);
+        } else if (nodeType === 'widget/button') {
+          inputSourceNode.size = [150, 50];
+          inputSourceNode.properties.text = inputSlot.name.split(' ').shift();
+        }
+
+        inputSourceNode.pos = [startX - inputSourceNode.size[0] - margin, lastY];
+        lastY += inputSourceNode.size[1] + margin;
+
+        inputSourceNode.connect(0, node, idx);
+      } else {
+        console.warn('Unhandled slot type: ', inputSlot);
+      }
+    });
+
+    // process outputs
+    // lastY = startY;
+    // node.outputs?.forEach((outputSlot, idx: number) => {
+    //   const nodeWatch = LiteGraph.createNode('basic/watch');
+    //   nodeWatch.pos = [startY + margin, lastY];
+    //   lastY += nodeWatch.``
+    //   graph.add(nodeWatch);
+
+    //   node.connect(idx, nodeWatch, 0);
+    // });
   }
 
 }

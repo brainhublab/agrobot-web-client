@@ -29,7 +29,7 @@ export class DevicesStateModel {
         id: 2,
         name: 'Title 3',
         mac_addr: '28:d4:0c:67:0f:4d',
-        configuration: defaultDeviceConfigurationTemplates[MCUTypes.LIGHT_CONTROL]
+        configuration: defaultDeviceConfigurationTemplates[MCUTypes.NUTRITION_CONTROL]
       },
       {
         id: 3,

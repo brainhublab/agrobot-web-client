@@ -4,7 +4,7 @@ import { Select } from '@ngxs/store';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
 import { Observable } from 'rxjs';
 import { Device } from 'src/app/modules/devices/models/device.model';
-import { NodesManager } from 'src/app/modules/shared/litegraph/nodes';
+import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
 
 @Component({
   selector: 'app-workspace',

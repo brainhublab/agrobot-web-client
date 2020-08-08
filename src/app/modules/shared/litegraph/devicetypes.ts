@@ -1,7 +1,12 @@
 import { INodeSlot } from "litegraph.js";
 import { MCUTypes } from 'src/app/modules/devices/models/device-configuration.model';
 
-export type GraphPins = Array<INodeSlot>;
+
+export interface NodeSlot extends INodeSlot {
+  choises?: Array<string>;
+}
+
+export type GraphPins = Array<NodeSlot>;
 export type NodeExecutor = { inSlots: Array<number>, outSlot: number, reducer: (v: Array<any>) => any };
 
 export interface DeviceTrigger {
@@ -13,6 +18,7 @@ export interface DeviceTrigger {
 export interface DevicePins {
   [key: string]: {
     in: GraphPins,
+    props?: GraphPins;
     out: GraphPins,
     triggers: Array<DeviceTrigger>,
     executors?: Array<NodeExecutor>,
@@ -21,15 +27,17 @@ export interface DevicePins {
 
 export const DEVICE_INPUTS_OUTPUTS: DevicePins = {
   [MCUTypes.LIGHT_CONTROL]: {
+    props: [
+      { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
+    ],
     in: [
-      { name: 'mode', type: 'string', label: 'Mode' },
       { name: 'target_level', type: 'number', label: 'Target Level' },
       { name: 'latitude', type: 'number', label: 'Latitude' },
       { name: 'longitude ', type: 'number', label: 'Longitude' },
-      { name: 'datetime', type: '', label: 'Valve state' },
+      // { name: 'datetime', type: '', label: 'Valve state' },
     ],
     out: [
-      { name: 'mode', type: 'number', label: 'Mode' },
+      { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
       { name: 'current_level', type: 'number', label: 'Current level' },
       { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
       { name: 'flow_sensors_count', type: 'number' },
@@ -43,17 +51,15 @@ export const DEVICE_INPUTS_OUTPUTS: DevicePins = {
     ]
   },
   [MCUTypes.NUTRITION_CONTROL]: {
+    props: [
+      { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
+    ],
     in: [
-      { name: 'target_level', type: 'number', label: 'Target Level' },
-      { name: 'latitude', type: 'number', label: 'Latitude' },
-      { name: 'longitude ', type: 'number', label: 'Longitude' },
-      { name: 'datetime', type: '', label: 'Valve state' },
+      { name: 'concentration ', type: 'number', label: 'Concentration' },
     ],
     out: [
-      { name: 'mode', type: 'number', label: 'Mode' },
-      { name: 'current_level', type: 'number', label: 'Current level' },
-      { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
-      { name: 'flow_sensors_count', type: 'number' },
+      { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
+      { name: 'current_concentration', type: 'number', label: 'Current concentration' },
     ],
     triggers: [
     ]
