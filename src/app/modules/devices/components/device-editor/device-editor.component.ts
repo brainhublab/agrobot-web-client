@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { LGraph, LiteGraph, LGraphCanvas, } from 'litegraph.js';
 import { Device } from '../../models/device.model';
-import { deleteNotAllowedNodes, registerDeviceConfigurationNode, getDeviceNodeType } from './nodes';
+import { deleteNotAllowedNodes, registerDeviceConfigurationNode, getDeviceNodeType } from '../../../shared/litegraph/nodes';
 
 
 const inputNodeTypesMap = {

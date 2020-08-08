@@ -1,6 +1,7 @@
 
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { Device } from '../models/device.model';
+import { defaultDeviceConfigurationTemplates, MCUTypes } from '../models/device-configuration.model';
 import { DeviceActions } from './devices.actions';
 
 export class DevicesStateModel {
@@ -13,19 +14,22 @@ export class DevicesStateModel {
     devices: [
       {
         id: 0,
-        name: 'Default device name',
+        name: 'Light cocntrol dev 1',
         mac_addr: '3b:6e:82:1c:1f:ca',
-        description: 'first device ever'
+        description: 'first device ever',
+        configuration: defaultDeviceConfigurationTemplates[MCUTypes.LIGHT_CONTROL]
       },
       {
         id: 1,
         name: 'Title 2',
-        mac_addr: 'd6:4e:e8:63:fa:41'
+        mac_addr: 'd6:4e:e8:63:fa:41',
+        configuration: defaultDeviceConfigurationTemplates[MCUTypes.WATER_LEVEL]
       },
       {
         id: 2,
         name: 'Title 3',
-        mac_addr: '28:d4:0c:67:0f:4d'
+        mac_addr: '28:d4:0c:67:0f:4d',
+        configuration: defaultDeviceConfigurationTemplates[MCUTypes.LIGHT_CONTROL]
       },
       {
         id: 3,

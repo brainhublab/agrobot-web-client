@@ -9,10 +9,6 @@ const routes: Routes = [
     loadChildren: () => import('./modules/devices/devices.module').then(m => m.DevicesModule)
   },
   {
-    path: 'workspace',
-    loadChildren: () => import('./modules/workspace/workspace.module').then(m => m.WorkspaceModule)
-  },
-  {
     path: 'analytics',
     loadChildren: () => import('./modules/analytics/analytics.module').then(m => m.AnalyticsModule)
   },

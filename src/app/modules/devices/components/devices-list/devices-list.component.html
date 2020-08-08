@@ -1,6 +1,11 @@
 <div class="page-container">
 
-  <h2 (click)="addDevice()">Devices list</h2>
+  <div nz-row nzType="flex" nzJustify="space-between">
+    <h2 (click)="addDevice()">Devices list</h2>
+    <button nz-button>
+      <a routerLink="/devices/workspace">See as a graph</a>
+    </button>
+  </div>
   <nz-list nzGrid>
     <div nz-row [nzGutter]="16">
       <div nz-col [nzXXl]="8" [nzXl]="4" [nzLg]="6" [nzMd]="6" [nzSm]="12" [nzXs]="24"

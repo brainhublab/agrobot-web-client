@@ -1,4 +1,4 @@
-import { LiteGraph, INodeSlot } from 'litegraph.js';
+import { LiteGraph, INodeSlot, LGraph, LGraphNode } from 'litegraph.js';
 import { Device } from 'src/app/modules/devices/models/device.model';
 import { MCUTypes } from 'src/app/modules/devices/models/device-configuration.model';
 
@@ -37,25 +37,28 @@ interface DevicePins {
   };
 }
 
+const MULTITON_NODES: Map<string, LGraphNode> = new Map<string, LGraphNode>();
 
-
-const registerNode = (cfg: NodeConfig) => {
+const registerNode = (cfg: NodeConfig, bindingMode: boolean = false) => {
 
   function NodeConstructor() {
+
     cfg.inputs.forEach(i => {
       if (i.type === 'string') {
         this.addWidget("combo", i.label, "red", (v) => null, { values: ["red", "green", "blue"] });
       } else if (i.type === 'number') {
         this.addWidget("number", i.label, 0.5, function (v) { }, { min: 0, max: 100 });
       }
-      //  else {
-      this.addInput(i.name, i.type);
-      // }
+      else {
+        this.addInput(i.name, i.type);
+      }
     });
 
-    cfg.outputs.forEach(o => {
-      // this.addOutput(o.name, o.type);
-    });
+    if (bindingMode) {
+      cfg.outputs.forEach(o => {
+        this.addOutput(o.name, o.type);
+      });
+    }
 
     cfg.triggers.forEach(t => {
       this.addInput(t.name, LiteGraph.ACTION);
@@ -81,6 +84,27 @@ const registerNode = (cfg: NodeConfig) => {
     if (trigger) {
       trigger.handler(action, param);
     }
+  };
+
+  NodeConstructor.prototype.onAdded = function (graph: LGraph) {
+    if (MULTITON_NODES.has(cfg.type)) {
+      console.warn('Cannot use same device twice'); // TODO: Notify user
+      this.onRemoved = () => { };
+      graph.remove(this);
+      // highlight previous node
+      const previousNode = MULTITON_NODES.get(cfg.type);
+      const oldColor = previousNode.color;
+      previousNode.color = '#a29bfe';
+      setTimeout(() => previousNode.color = oldColor, 200);
+      return;
+    } else {
+      MULTITON_NODES.set(cfg.type, this);
+    }
+  };
+
+
+  NodeConstructor.prototype.onRemoved = function () {
+    MULTITON_NODES.delete(cfg.type);
   };
 
 
@@ -176,5 +200,19 @@ export const registerDeviceConfigurationNode = (device: Device) => {
     triggers: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].triggers,
   };
   registerNode(cfg);
+  return cfg;
+};
+
+export const registerWsDeviceNode = (device: Device) => {
+  console.log(device.configuration)
+  const cfg = {
+    type: getDeviceNodeType(device),
+    title: device.name,
+    inputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].in,
+    outputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].out,
+    executors: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].executors,
+    triggers: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].triggers,
+  };
+  registerNode(cfg, true);
   return cfg;
 };

@@ -1,11 +1,10 @@
 import { Component, OnInit, AfterViewInit, HostListener } from '@angular/core';
-import { LGraph, LGraphCanvas } from 'litegraph.js';
-import './nodes';
+import { LGraph, LGraphCanvas, LiteGraph } from 'litegraph.js';
 import { Select } from '@ngxs/store';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
 import { Observable } from 'rxjs';
 import { Device } from 'src/app/modules/devices/models/device.model';
-import { registerDeviceNode, deleteNotAllowedNodes } from './nodes';
+import { deleteNotAllowedNodes, registerWsDeviceNode } from 'src/app/modules/shared/litegraph/nodes';
 
 @Component({
   selector: 'app-workspace',
@@ -16,7 +15,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
   private graph: LGraph;
   private canvas: LGraphCanvas;
 
-  @Select(DevicesState.getDevices) configuredDevices$: Observable<Array<Device>>;
+  @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<Device>>;
 
   width = 1024;
   height = 720;
@@ -31,10 +30,6 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     deleteNotAllowedNodes();
-    this.configuredDevices$.subscribe((devices: Array<Device>) => {
-      console.log(devices);
-      devices?.forEach(registerDeviceNode);
-    });
   }
 
   ngAfterViewInit() {
@@ -51,6 +46,18 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
     this.graph = new LGraph();
 
     this.canvas = new LGraphCanvas('#workspaceCanvas', this.graph);
+    let lastOffset = 30;
+    this.configuredDevices$.subscribe((devices: Array<Device>) => {
+      console.log(devices);
+      devices?.forEach((d, idx) => {
+        const cfg = registerWsDeviceNode(d);
+        const deviceNode = LiteGraph.createNode(cfg.type);
+        deviceNode.pos = [lastOffset, 200];
+        lastOffset += deviceNode.computeSize()[0] + 50;
+        this.graph.add(deviceNode);
+      });
+    });
+
   }
 
 }

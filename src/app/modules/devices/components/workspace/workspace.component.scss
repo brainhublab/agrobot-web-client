@@ -1,0 +1,12 @@
+:host {
+  display: block;
+  position: relative;
+  canvas {
+    display: block;
+  }
+  .buttons {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+}

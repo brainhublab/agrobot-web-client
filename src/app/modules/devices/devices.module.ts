@@ -20,9 +20,10 @@ import { DeviceDetailsComponent } from './components/device-details/device-detai
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule } from '@angular/forms';
 import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
+import { WorkspaceComponent } from './components/workspace/workspace.component';
 
 @NgModule({
-  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent],
+  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent],
   imports: [
     CommonModule,
     FormsModule,
