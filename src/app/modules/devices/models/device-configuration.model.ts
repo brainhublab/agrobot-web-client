@@ -44,12 +44,18 @@ export class WaterLevelConfig implements DeviceConfiguration {
   };
 }
 
+export interface LightControlInputs {
+  lightMode: number;
+  targetLigstLevel: number;
+  currentTime: string;
+  lightIntensityMap: Array<number>;
+}
 
 export class LightControlConfig implements DeviceConfiguration {
-  readonly mcuType = MCUTypes.LIGHT_CONTROL;
-  readonly title = 'Light control';
-  isConfigured = true;
-  in = {
+  public readonly mcuType = MCUTypes.LIGHT_CONTROL;
+  public readonly title = 'Light control';
+  public isConfigured = true;
+  public in: LightControlInputs = {
     lightMode: 100,
     targetLigstLevel: 100,
     currentTime: '12:30',
@@ -80,7 +86,7 @@ export class LightControlConfig implements DeviceConfiguration {
       0, 0, 0, 0
     ]
   };
-  out = {
+  public out = {
     lightMode: 100,
     currentLightLevel: 100,
     targetLightLevel: 100,

@@ -1,7 +1,9 @@
-import { LiteGraph, LGraph, LGraphNode } from 'litegraph.js';
-import { Device } from 'src/app/modules/devices/models/device.model';
+import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
+import { Device, SerializedGraph } from 'src/app/modules/devices/models/device.model';
+import { LightControlInputs, DeviceConfiguration, MCUTypes, LightControlConfig } from 'src/app/modules/devices/models/device-configuration.model';
 
 import { DEVICE_INPUTS_OUTPUTS, GraphPins, NodeExecutor, DeviceTrigger } from './devicetypes';
+import { Observable, of } from 'rxjs';
 
 export interface NodeConfig {
   type: string;
@@ -51,23 +53,38 @@ class NodesManager {
   }
 
   private getNodeConfig(device: Device): NodeConfig {
+    const deviceIO = DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType];
     return {
       type: this.getDeviceNodeType(device),
       title: `${device.name} (${device.configuration.mcuType}, ${device.id})`,
-      props: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].props,
-      inputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].in,
-      outputs: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].out,
-      executors: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].executors,
-      triggers: DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType].triggers,
+      props: deviceIO.props,
+      inputs: deviceIO.in,
+      outputs: deviceIO.out,
+      executors: deviceIO.executors,
+      triggers: deviceIO.triggers,
     };
   }
 
   public getDeviceNodeType = (device: Device): string => {
-    return `${device.configuration.mcuType}/${device.name}-${device.id}`;
+    return `${device.configuration.mcuType}/${device.id}`;
+  }
+
+
+  public parseDeviceNodeType = (type: string): { mcuType: MCUTypes, id: number } => {
+    const spl = type.split('/');
+    const mcuType = Object.values(MCUTypes).find(x => x === spl[0]);
+
+    const result = {
+      mcuType: mcuType,
+      id: parseInt(spl[1]),
+    };
+
+    return !isNaN(result.id) ? result : null;
   }
 
   public deleteNotAllowedNodes = () => {
     // remove not allowed nodes
+    // TODO: Re-register deleted nodes
     for (const nodeType in LiteGraph.registered_node_types) {
       if (!this.allowedNodeTypes.find(v => v === nodeType)) {
         delete LiteGraph.registered_node_types[nodeType];
@@ -78,16 +95,17 @@ class NodesManager {
   private registerNode(cfg: NodeConfig, bindingMode: boolean = false) {
     const that = this;
     function NodeConstructor() {
-
       cfg.inputs.forEach(i => {
         this.addInput(i.name, i.type);
       });
 
+      this.serialize_widgets = true;
       cfg.props?.forEach(p => {
         if (p.choises?.length > 0) {
           this.addWidget('combo', p.label, p.choises[0], (v) => null, { values: p.choises });
         } else if (p.type === 'number') {
-          this.addWidget('number', p.label, 0.5, function (v) { }, { min: 0, max: 100 });
+          // TODO: min, max, default
+          this.addWidget('number', p.label, 0.5, (v) => null, { min: 0, max: 100 });
         } else {
           console.warn('Unhandled prop: ', p);
         }
@@ -101,7 +119,7 @@ class NodesManager {
 
       cfg.triggers.forEach(t => {
         this.addInput(t.name, LiteGraph.ACTION);
-        this.button = this.addWidget('button', t.name, 'Button', function (v) { }, {});
+        this.button = this.addWidget('button', t.name, 'Button', v => v, {});
       });
     }
 
@@ -180,17 +198,46 @@ class NodesManager {
         console.warn('Unhandled slot type: ', inputSlot);
       }
     });
+  }
 
-    // process outputs
-    // lastY = startY;
-    // node.outputs?.forEach((outputSlot, idx: number) => {
-    //   const nodeWatch = LiteGraph.createNode('basic/watch');
-    //   nodeWatch.pos = [startY + margin, lastY];
-    //   lastY += nodeWatch.``
-    //   graph.add(nodeWatch);
 
-    //   node.connect(idx, nodeWatch, 0);
-    // });
+  public syncDeviceConfig(device: Device, deviceNode: SerializedLGraphNode, cfg: SerializedGraph): DeviceConfiguration {
+    if (device.configuration instanceof LightControlConfig) {
+      // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
+      const newInConfig: Partial<LightControlInputs> = { ...device.configuration.in };
+
+      // TODO: specify widgets order
+      // Update Mode
+      newInConfig.lightMode = deviceNode.widgets_values[0];
+
+      for (const input of deviceNode.inputs) {
+        // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
+        // we are the target node
+        const link = cfg.links.find(l => l[0] === input.link);
+        const sourceNode = cfg.nodes.find(n => n.id === link[1]);
+        const sourceOutput = sourceNode.outputs[link[2]];
+        switch (input.name) {
+          case 'target_level':
+            newInConfig.targetLigstLevel = parseFloat(sourceOutput.label);
+            break;
+          case 'latitude':
+            // TODO: ask
+            break;
+          case 'longitude':
+            // TODO: ask
+            break;
+        }
+      }
+
+      const newConfig: LightControlConfig = {
+        ...device.configuration, // preserve old
+        in: {
+          ...device.configuration.in, // preserve old cfgs
+          ...newInConfig // apply new cfgs
+        }
+      };
+      return newConfig;
+    }
   }
 
 }
