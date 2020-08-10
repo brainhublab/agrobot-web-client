@@ -14,6 +14,7 @@ import en from '@angular/common/locales/en';
 registerLocaleData(en);
 
 import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { environment } from 'src/environments/environment';
 import { HeaderComponent } from './components/header/header.component';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -36,6 +37,9 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     BrowserAnimationsModule,
     NgxsModule.forRoot([], {
       developmentMode: !environment.production
+    }),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production
     }),
     NotificationsModule,
     AppRoutingModule,
