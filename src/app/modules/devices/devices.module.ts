@@ -21,6 +21,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule } from '@angular/forms';
 import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { NzModalModule } from 'ng-zorro-antd/modal';
 
 @NgModule({
   declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent],
@@ -40,6 +41,7 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
     NzToolTipModule,
     NzDividerModule,
     NzSelectModule,
+    NzModalModule,
     NgxsModule.forFeature(
       [DevicesState]
     )

@@ -5,6 +5,7 @@ import { DevicesState } from 'src/app/modules/devices/state/devices.state';
 import { Observable } from 'rxjs';
 import { Device } from 'src/app/modules/shared/litegraph/device.model';
 import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
+import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
 
 @Component({
   selector: 'app-workspace',
@@ -23,6 +24,8 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
       'widget/combo',
     ]
   );
+  dirty = false;
+
   @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<Device>>;
 
   width = 1024;
@@ -54,6 +57,14 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
     this.graph = new LGraph();
 
     this.canvas = new LGraphCanvas('#workspaceCanvas', this.graph);
+    this.canvas.canvas.addEventListener('mousedown', () => {
+      // handle changes
+      this.dirty = true;
+    });
+    this.addNodes();
+  }
+
+  private addNodes() {
     let lastOffset = 30;
     this.configuredDevices$.subscribe((devices: Array<Device>) => {
       devices?.forEach((d, idx) => {
@@ -64,9 +75,14 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
         this.graph.add(deviceNode);
       });
     });
-
   }
 
+  public save() {
+    const serializedGraph: SerializedGraph = this.graph.serialize();
+
+    console.log('serializd: ', serializedGraph);
+    this.dirty = false;
+  }
 
   // private async syncDevicesConfigurations(cfg: SerializedGraph): Promise<Array<{ id: number, configuration: DeviceConfiguration }>> {
   //   const deviceConfigs: Array<{ id: number, configuration: DeviceConfiguration }> = [];

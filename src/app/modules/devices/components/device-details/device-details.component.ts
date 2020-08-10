@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { DevicesState } from '../../state/devices.state';
@@ -7,6 +7,7 @@ import { Device } from '../../../shared/litegraph/device.model';
 import { Observable } from 'rxjs';
 import { DeviceActions } from '../../state/devices.actions';
 import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
+import { DeviceEditorComponent } from '../device-editor/device-editor.component';
 
 @Component({
   selector: 'app-device-details',
@@ -15,6 +16,7 @@ import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-ty
 })
 export class DeviceDetailsComponent implements OnInit {
   public device$: Observable<Device>;
+  @ViewChild('deviceEditor') deviceEditorComponent: DeviceEditorComponent;
 
   private deviceID: number;
 
@@ -23,6 +25,10 @@ export class DeviceDetailsComponent implements OnInit {
     { name: 'Nutrition control', value: DeviceConfigurations.MCUTypes.NUTRITION_CONTROL },
     { name: 'Light control', value: DeviceConfigurations.MCUTypes.LIGHT_CONTROL },
   ];
+
+  public get dirty() {
+    return this.deviceEditorComponent.dirty;
+  }
 
   constructor(
     private readonly route: ActivatedRoute,

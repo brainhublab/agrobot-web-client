@@ -84,31 +84,43 @@ class NodesManager {
   private registerNode(cfg: NodeConfig, bindingMode: boolean = false) {
     const that = this;
     function NodeConstructor() {
+      // always serialize widgets
+      this.serialize_widgets = true;
+
+      // add inputs
       cfg.inputs.forEach(i => {
         this.addInput(i.name, i.type);
       });
 
-      this.serialize_widgets = true;
-      cfg.props?.forEach(p => {
-        if (p.choises?.length > 0) {
-          this.addWidget('combo', p.label, p.choises[0], (v) => null, { values: p.choises });
-        } else if (p.type === 'number') {
-          // TODO: min, max, default
-          this.addWidget('number', p.label, 0.5, (v) => null, { min: 0, max: 100 });
-        } else {
-          console.warn('Unhandled prop: ', p);
-        }
-      });
+      if (!bindingMode) {
+        // add props using widgets
+        cfg.props?.forEach(p => {
+          if (p.choises?.length > 0) {
+            this.addWidget('combo', p.label, p.choises[0], (v) => null, { values: p.choises });
+          } else if (p.type === 'number') {
+            // TODO: min, max, default
+            this.addWidget('number', p.label, 0.5, (v) => null, { min: 0, max: 100 });
+          } else {
+            console.warn('Unhandled prop: ', p);
+          }
+        });
+      }
 
       if (bindingMode) {
+        // add outputs
         cfg.outputs.forEach(o => {
           this.addOutput(o.name, o.type);
         });
       }
 
+      // add triggers
       cfg.triggers.forEach(t => {
+        // input trigger , handled by onAction function
         this.addInput(t.name, LiteGraph.ACTION);
-        this.button = this.addWidget('button', t.name, 'Button', v => v, {});
+        if (!bindingMode) {
+          // widget trigger
+          this.button = this.addWidget('button', t.name, 'Button', t.handler, {});
+        }
       });
     }
 
@@ -152,8 +164,6 @@ class NodesManager {
     NodeConstructor.prototype.onRemoved = function () {
       that.multitonNodes.delete(cfg.type);
     };
-
-
 
     // register in the system
     LiteGraph.registerNodeType(cfg.type, NodeConstructor as any);
