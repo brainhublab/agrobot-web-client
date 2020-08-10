@@ -1,8 +1,8 @@
 
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { Device } from '../models/device.model';
-import { defaultDeviceConfigurationTemplates, MCUTypes } from '../models/device-configuration.model';
+import { Device } from '../../shared/litegraph/device.model';
 import { DeviceActions } from './devices.actions';
+import { DeviceConfigurations } from '../../shared/litegraph/config-types';
 
 export class DevicesStateModel {
   devices: Device[];
@@ -17,19 +17,19 @@ export class DevicesStateModel {
         name: 'Light cocntrol dev 1',
         mac_addr: '3b:6e:82:1c:1f:ca',
         description: 'first device ever',
-        configuration: defaultDeviceConfigurationTemplates[MCUTypes.LIGHT_CONTROL]
+        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
       },
       {
         id: 1,
         name: 'Title 2',
         mac_addr: 'd6:4e:e8:63:fa:41',
-        configuration: defaultDeviceConfigurationTemplates[MCUTypes.WATER_LEVEL]
+        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.WATER_LEVEL]
       },
       {
         id: 2,
         name: 'Title 3',
         mac_addr: '28:d4:0c:67:0f:4d',
-        configuration: defaultDeviceConfigurationTemplates[MCUTypes.NUTRITION_CONTROL]
+        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.NUTRITION_CONTROL]
       },
       {
         id: 3,

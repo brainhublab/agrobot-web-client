@@ -1,5 +1,5 @@
 import { Component, OnInit, HostBinding } from '@angular/core';
-import { Device } from '../../models/device.model';
+import { Device } from '../../../shared/litegraph/device.model';
 import { Store, Select } from '@ngxs/store';
 import { DeviceActions } from '../../state/devices.actions';
 import { DevicesState } from '../../state/devices.state';

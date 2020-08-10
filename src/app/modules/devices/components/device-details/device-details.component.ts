@@ -3,10 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { DevicesState } from '../../state/devices.state';
 import { map } from 'rxjs/operators';
-import { Device } from '../../models/device.model';
+import { Device } from '../../../shared/litegraph/device.model';
 import { Observable } from 'rxjs';
 import { DeviceActions } from '../../state/devices.actions';
-import { MCUTypes, defaultDeviceConfigurationTemplates } from '../../models/device-configuration.model';
+import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
 
 @Component({
   selector: 'app-device-details',
@@ -19,9 +19,9 @@ export class DeviceDetailsComponent implements OnInit {
   private deviceID: number;
 
   public readonly deviceTemplates = [
-    { name: 'Water level', value: MCUTypes.WATER_LEVEL },
-    { name: 'Nutrition control', value: MCUTypes.NUTRITION_CONTROL },
-    { name: 'Light control', value: MCUTypes.LIGHT_CONTROL },
+    { name: 'Water level', value: DeviceConfigurations.MCUTypes.WATER_LEVEL },
+    { name: 'Nutrition control', value: DeviceConfigurations.MCUTypes.NUTRITION_CONTROL },
+    { name: 'Light control', value: DeviceConfigurations.MCUTypes.LIGHT_CONTROL },
   ];
 
   constructor(
@@ -42,8 +42,8 @@ export class DeviceDetailsComponent implements OnInit {
     });
   }
 
-  public onTemplateChange(templateValue: MCUTypes) {
-    const conf = defaultDeviceConfigurationTemplates[templateValue];
+  public onTemplateChange(templateValue: DeviceConfigurations.MCUTypes) {
+    const conf = DeviceConfigurations.defaultDeviceConfigurationTemplates[templateValue];
     if (!conf) {
       alert('Wrong config'); // TODO
       return;

@@ -1,18 +1,11 @@
 import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
-import { Device, SerializedGraph } from 'src/app/modules/devices/models/device.model';
-import { LightControlInputs, DeviceConfiguration, MCUTypes, LightControlConfig, WaterLevelConfig, WaterLevelInputs, NutritionControlConfig, NutritionControlDispanser } from 'src/app/modules/devices/models/device-configuration.model';
+import { Device } from 'src/app/modules/shared/litegraph/device.model';
+import { DeviceConfigurations } from './config-types';
+import { SerializedGraph } from './types';
 
-import { DEVICE_INPUTS_OUTPUTS, GraphPins, NodeExecutor, DeviceTrigger } from './devicetypes';
-import { Observable, of } from 'rxjs';
-
-export interface NodeConfig {
+interface NodeConfig extends DeviceConfigurations.ILGraphDeviceNodeDescriptor {
   type: string;
   title: string;
-  props: GraphPins;
-  inputs: GraphPins;
-  outputs: GraphPins;
-  executors?: Array<NodeExecutor>;
-  triggers?: Array<DeviceTrigger>;
 }
 
 
@@ -53,15 +46,11 @@ class NodesManager {
   }
 
   private getNodeConfig(device: Device): NodeConfig {
-    const deviceIO = DEVICE_INPUTS_OUTPUTS[device.configuration?.mcuType];
+    const deviceNodeDescriptor = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.configuration?.mcuType];
     return {
       type: this.getDeviceNodeType(device),
       title: `${device.name} (${device.configuration.mcuType}, ${device.id})`,
-      props: deviceIO.props,
-      inputs: deviceIO.in,
-      outputs: deviceIO.out,
-      executors: deviceIO.executors,
-      triggers: deviceIO.triggers,
+      ...deviceNodeDescriptor,
     };
   }
 
@@ -70,12 +59,12 @@ class NodesManager {
   }
 
 
-  public parseDeviceNodeType = (type: string): { mcuType: MCUTypes, id: number } => {
+  public parseDeviceNodeType = (type: string): { mcuType: DeviceConfigurations.MCUTypes, id: number } => {
     const spl = type.split('/');
-    const mcuType = Object.values(MCUTypes).find(x => x === spl[0]);
+    const mcuType = Object.values(DeviceConfigurations.MCUTypes).find(x => x === spl[0]);
 
     const result = {
-      mcuType: mcuType,
+      mcuType,
       id: parseInt(spl[1]),
     };
 
@@ -201,7 +190,7 @@ class NodesManager {
   }
 
   private syncDeviceInputs(deviceNode: SerializedLGraphNode, cfg: SerializedGraph, propMap: Map<string, string>) {
-    let result: object = {};
+    const result: object = {};
     for (const input of deviceNode.inputs) {
       // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
       // we are the target node
@@ -217,34 +206,45 @@ class NodesManager {
     return result;
   }
 
-  public syncDeviceConfig(device: Device, deviceNode: SerializedLGraphNode, cfg: SerializedGraph): DeviceConfiguration {
+  /**
+   * Generates new device config based on serialized graph
+   * @param device Device item
+   * @param deviceNode serialized node associated with the device
+   * @param serializedGraph serialized graph
+   * @returns New device configuration
+   */
+  public syncDeviceConfig(
+    device: Device,
+    deviceNode: SerializedLGraphNode,
+    serializedGraph: SerializedGraph
+  ): DeviceConfigurations.DeviceConfiguration {
     const oldConfig = { ...device.configuration };
     let newInConfig: any;
 
-    if (device.configuration.mcuType === MCUTypes.WATER_LEVEL) {
+    if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.WATER_LEVEL) {
       const propsMap = new Map<string, string>([
         ['target_level', 'levelPercents'],
         ['valve_state', 'valve'],
 
       ]);
 
-      const syncedInputs = this.syncDeviceInputs(deviceNode, cfg, propsMap);
+      const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, propsMap);
 
       newInConfig = {
         ...oldConfig.in,
         ...syncedInputs,
       };
-    } else if (device.configuration.mcuType === MCUTypes.LIGHT_CONTROL) {
+    } else if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.LIGHT_CONTROL) {
       // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
       const propsMap = new Map<string, string>([
         ['target_level', 'targetLigstLevel']
       ]);
-      const syncedInputs = this.syncDeviceInputs(deviceNode, cfg, propsMap);
+      const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, propsMap);
 
-      const newLightInConfig: Partial<LightControlInputs> = { ...oldConfig.in };
+      const newLightInConfig: Partial<DeviceConfigurations.LightControlInputs> = { ...oldConfig.in };
       // Update Mode
       newLightInConfig.lightMode = deviceNode.widgets_values[
-        DEVICE_INPUTS_OUTPUTS[MCUTypes.LIGHT_CONTROL]
+        DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
           .props.findIndex(v => v.name === 'mode')
       ];
 
@@ -252,12 +252,12 @@ class NodesManager {
         ...newLightInConfig,
         ...syncedInputs,
       };
-    } else if (device.configuration.mcuType === MCUTypes.NUTRITION_CONTROL) {
+    } else if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.NUTRITION_CONTROL) {
       // TODO;
     }
 
 
-    const newConfig: DeviceConfiguration = {
+    const newConfig: DeviceConfigurations.DeviceConfiguration = {
       ...oldConfig, // preserve old
       in: {
         ...oldConfig.in, // preserve old cfgs
