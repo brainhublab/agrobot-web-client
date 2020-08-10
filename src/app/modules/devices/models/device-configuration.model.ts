@@ -8,13 +8,30 @@ export interface DeviceConfiguration {
   mcuType: MCUTypes;
   title: string;
   isConfigured: boolean;
+  in?: any;
+  out?: any;
+  disensers?: any;
+}
+
+
+export interface WaterLevelInputs {
+  valve: number;
+  levelPercents: number;
+  PID: {
+    agKp: number,
+    agKi: number,
+    agKd: number,
+    consKp: number,
+    consKi: number,
+    consKd: number
+  };
 }
 
 export class WaterLevelConfig implements DeviceConfiguration {
   readonly mcuType = MCUTypes.WATER_LEVEL;
   readonly title = 'Water level';
   isConfigured = true;
-  in = {
+  in: WaterLevelInputs = {
     valve: 100,
     levelPercents: 100,
     PID: {
@@ -91,6 +108,18 @@ export class LightControlConfig implements DeviceConfiguration {
     currentLightLevel: 100,
     targetLightLevel: 100,
     currentTime: '12:30'
+  };
+}
+
+export interface NutritionControlDispanser {
+  in: {
+    nutritionMode: number;
+    targetConcentration: number;
+  },
+  out: {
+    nutritionMode: number;
+    currentConcentration: number;
+    targetConcentration: number;
   };
 }
 

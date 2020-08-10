@@ -1,6 +1,6 @@
 import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
 import { Device, SerializedGraph } from 'src/app/modules/devices/models/device.model';
-import { LightControlInputs, DeviceConfiguration, MCUTypes, LightControlConfig } from 'src/app/modules/devices/models/device-configuration.model';
+import { LightControlInputs, DeviceConfiguration, MCUTypes, LightControlConfig, WaterLevelConfig, WaterLevelInputs, NutritionControlConfig, NutritionControlDispanser } from 'src/app/modules/devices/models/device-configuration.model';
 
 import { DEVICE_INPUTS_OUTPUTS, GraphPins, NodeExecutor, DeviceTrigger } from './devicetypes';
 import { Observable, of } from 'rxjs';
@@ -200,44 +200,73 @@ class NodesManager {
     });
   }
 
+  private syncDeviceInputs(deviceNode: SerializedLGraphNode, cfg: SerializedGraph, propMap: Map<string, string>) {
+    let result: object = {};
+    for (const input of deviceNode.inputs) {
+      // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
+      // we are the target node
+      const link = cfg.links.find(l => l[0] === input.link);
+      if (!link) {
+        // empty input, let's check the next one
+        continue;
+      }
+      const sourceNode = cfg.nodes.find(n => n.id === link[1]);
+      result[propMap.get(input.name)] = sourceNode.properties.value;
+    }
+
+    return result;
+  }
 
   public syncDeviceConfig(device: Device, deviceNode: SerializedLGraphNode, cfg: SerializedGraph): DeviceConfiguration {
-    if (device.configuration instanceof LightControlConfig) {
-      // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
-      const newInConfig: Partial<LightControlInputs> = { ...device.configuration.in };
+    const oldConfig = { ...device.configuration };
+    let newInConfig: any;
 
-      // TODO: specify widgets order
-      // Update Mode
-      newInConfig.lightMode = deviceNode.widgets_values[0];
+    if (device.configuration.mcuType === MCUTypes.WATER_LEVEL) {
+      const propsMap = new Map<string, string>([
+        ['target_level', 'levelPercents'],
+        ['valve_state', 'valve'],
 
-      for (const input of deviceNode.inputs) {
-        // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
-        // we are the target node
-        const link = cfg.links.find(l => l[0] === input.link);
-        const sourceNode = cfg.nodes.find(n => n.id === link[1]);
-        const sourceOutput = sourceNode.outputs[link[2]];
-        switch (input.name) {
-          case 'target_level':
-            newInConfig.targetLigstLevel = parseFloat(sourceOutput.label);
-            break;
-          case 'latitude':
-            // TODO: ask
-            break;
-          case 'longitude':
-            // TODO: ask
-            break;
-        }
-      }
+      ]);
 
-      const newConfig: LightControlConfig = {
-        ...device.configuration, // preserve old
-        in: {
-          ...device.configuration.in, // preserve old cfgs
-          ...newInConfig // apply new cfgs
-        }
+      const syncedInputs = this.syncDeviceInputs(deviceNode, cfg, propsMap);
+
+      newInConfig = {
+        ...oldConfig.in,
+        ...syncedInputs,
       };
-      return newConfig;
+    } else if (device.configuration.mcuType === MCUTypes.LIGHT_CONTROL) {
+      // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
+      const propsMap = new Map<string, string>([
+        ['target_level', 'targetLigstLevel']
+      ]);
+      const syncedInputs = this.syncDeviceInputs(deviceNode, cfg, propsMap);
+
+      const newLightInConfig: Partial<LightControlInputs> = { ...oldConfig.in };
+      // Update Mode
+      newLightInConfig.lightMode = deviceNode.widgets_values[
+        DEVICE_INPUTS_OUTPUTS[MCUTypes.LIGHT_CONTROL]
+          .props.findIndex(v => v.name === 'mode')
+      ];
+
+      newInConfig = {
+        ...newLightInConfig,
+        ...syncedInputs,
+      };
+    } else if (device.configuration.mcuType === MCUTypes.NUTRITION_CONTROL) {
+      // TODO;
     }
+
+
+    const newConfig: DeviceConfiguration = {
+      ...oldConfig, // preserve old
+      in: {
+        ...oldConfig.in, // preserve old cfgs
+        ...newInConfig,
+      }
+    };
+
+    return newConfig;
+
   }
 
 }

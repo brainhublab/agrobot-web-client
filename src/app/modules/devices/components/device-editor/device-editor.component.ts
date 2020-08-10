@@ -78,29 +78,8 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     return this.store
       .dispatch(new DeviceActions.Edit(
         this.device.id,
-        { serialized_graph: JSON.stringify(serializedGraph) }
+        { serialized_graph: JSON.stringify(serializedGraph), configuration: syncedDeviceConfiguration }
       )).subscribe(_ => this.dirty = false);
-  }
-
-  private async syncDevicesConfigurations(cfg: SerializedGraph): Promise<Array<{ id: number, configuration: DeviceConfiguration }>> {
-    const deviceConfigs: Array<{ id: number, configuration: DeviceConfiguration }> = [];
-
-    for (const deviceNode of cfg.nodes) {
-      const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
-      if (deviceInfo && !isNaN(deviceInfo.id)) {
-        const device: Device = await this.store.select(DevicesState.getByID)
-          .pipe(
-            first(),
-            map(ff => ff(deviceInfo.id))
-          ).toPromise();
-        const newConfig = this.nodesManager.syncDeviceConfig(device, deviceNode, cfg);
-
-        deviceConfigs.push({ id: device.id, configuration: newConfig });
-      }
-    }
-
-    console.log(deviceConfigs);
-    return deviceConfigs;
   }
 
   private syncDeviceConfiguration(device: Device, serializedGraph: SerializedGraph): DeviceConfiguration {

@@ -31,10 +31,10 @@ export const DEVICE_INPUTS_OUTPUTS: DevicePins = {
       { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
     ],
     in: [
-      { name: 'target_level', type: 'number', label: 'Target Level' },
+      { name: 'target_level', type: 'number', label: 'Target Leve l' },
       { name: 'latitude', type: 'number', label: 'Latitude' },
       { name: 'longitude ', type: 'number', label: 'Longitude' },
-      // { name: 'datetime', type: '', label: 'Valve state' },
+      { name: 'datetime', type: '', label: 'Curerent Time' },
     ],
     out: [
       { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },

@@ -56,7 +56,6 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
     this.canvas = new LGraphCanvas('#workspaceCanvas', this.graph);
     let lastOffset = 30;
     this.configuredDevices$.subscribe((devices: Array<Device>) => {
-      console.log(devices);
       devices?.forEach((d, idx) => {
         const cfg = this.nodesManager.registerWsDeviceNode(d);
         const deviceNode = LiteGraph.createNode(cfg.type);
@@ -67,5 +66,26 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
     });
 
   }
+
+
+  // private async syncDevicesConfigurations(cfg: SerializedGraph): Promise<Array<{ id: number, configuration: DeviceConfiguration }>> {
+  //   const deviceConfigs: Array<{ id: number, configuration: DeviceConfiguration }> = [];
+
+  //   for (const deviceNode of cfg.nodes) {
+  //     const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
+  //     if (deviceInfo && !isNaN(deviceInfo.id)) {
+  //       const device: Device = await this.store.select(DevicesState.getByID)
+  //         .pipe(
+  //           first(),
+  //           map(ff => ff(deviceInfo.id))
+  //         ).toPromise();
+  //       const newConfig = this.nodesManager.syncDeviceConfig(device, deviceNode, cfg);
+
+  //       deviceConfigs.push({ id: device.id, configuration: newConfig });
+  //     }
+  //   }
+
+  //   return deviceConfigs;
+  // }
 
 }
