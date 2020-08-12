@@ -1,5 +1,6 @@
 import { DeviceConfigurations } from './config-types';
 import { IBaseModel } from '../base.model';
+import { SerializedGraph } from './types';
 
 /**
  * Device model
@@ -9,8 +10,8 @@ export interface IDevice extends IBaseModel {
   mac_addr?: string;
   name: string;
   description?: string;
-  configuration?: DeviceConfigurations.IDeviceConfiguration;
   // tslint:disable-next-line: variable-name
-  serialized_graph?: string; // JSON.string of SerializedGraph;
+  esp_config?: DeviceConfigurations.IDeviceConfiguration;
+  graph?: SerializedGraph;
   subscribers?: Array<string>;
 }

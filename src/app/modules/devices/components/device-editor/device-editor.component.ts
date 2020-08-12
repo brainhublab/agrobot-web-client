@@ -73,13 +73,14 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
    * Save serialized graph configuration
    */
   public save() {
-    const serializedGraph: SerializedGraph = this.graph.serialize();
+    const serializedGraph: SerializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
     const syncedDeviceConfiguration = this.syncDeviceConfiguration(this.device, serializedGraph);
+
 
     return this.store
       .dispatch(new DeviceActions.Edit(
         this.device.id,
-        { serialized_graph: JSON.stringify(serializedGraph), configuration: syncedDeviceConfiguration }
+        { graph: serializedGraph, esp_config: syncedDeviceConfiguration }
       )).pipe(first()).subscribe(_ => this.dirty = false);
   }
 
@@ -88,7 +89,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
 
     const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
     if (deviceInfo && !isNaN(deviceInfo.id)) {
-      const newConfig = this.nodesManager.syncDeviceConfig(device, deviceNode, serializedGraph);
+      const newConfig = { ...this.nodesManager.syncDeviceConfig(device, deviceNode, serializedGraph) };
       return newConfig;
     } else {
       return null;
@@ -101,9 +102,9 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   private constructGraph() {
     this.nodesManager.registerDeviceConfigurationNode(this.device);
 
-    if (this.device.serialized_graph) {
+    if (this.device.graph?.nodes) {
       // use old graph
-      this.graph.configure(JSON.parse(this.device.serialized_graph));
+      this.graph.configure(this.device.graph);
     } else {
       // construct new one
       const deviceNode = LiteGraph.createNode(this.nodesManager.getDeviceNodeType(this.device));

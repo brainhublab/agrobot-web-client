@@ -1,6 +1,11 @@
 import { IDevice as DeviceModel } from '../../shared/litegraph/device.model';
 
 export namespace DeviceActions {
+  export class Reload {
+    static readonly type = '[DEVICE] Reload';
+    constructor() { }
+  }
+
   export class Add {
     static readonly type = '[DEVICE] Add';
 

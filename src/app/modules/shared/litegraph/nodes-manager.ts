@@ -46,16 +46,16 @@ class NodesManager {
   }
 
   private getNodeConfig(device: IDevice): INodeConfig {
-    const deviceNodeDescriptor = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.configuration?.mcuType];
+    const deviceNodeDescriptor = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.esp_config?.mcuType];
     return {
       type: this.getDeviceNodeType(device),
-      title: `${device.name} (${device.configuration.mcuType}, ${device.id})`,
+      title: `${device.name} (${device.esp_config.mcuType}, ${device.id})`,
       ...deviceNodeDescriptor,
     };
   }
 
   public getDeviceNodeType = (device: IDevice): string => {
-    return `${device.configuration.mcuType}/${device.id}`;
+    return `${device.esp_config.mcuType}/${device.id}`;
   }
 
 
@@ -228,10 +228,10 @@ class NodesManager {
     deviceNode: SerializedLGraphNode,
     serializedGraph: SerializedGraph
   ): DeviceConfigurations.IDeviceConfiguration {
-    const oldConfig = { ...device.configuration };
+    const oldConfig = { ...device.esp_config };
     let newInConfig: any;
 
-    if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.WATER_LEVEL) {
+    if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.WATER_LEVEL) {
       const propsMap = new Map<string, string>([
         ['target_level', 'levelPercents'],
         ['valve_state', 'valve'],
@@ -244,7 +244,7 @@ class NodesManager {
         ...oldConfig.in,
         ...syncedInputs,
       };
-    } else if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.LIGHT_CONTROL) {
+    } else if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.LIGHT_CONTROL) {
       // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
       const propsMap = new Map<string, string>([
         ['target_level', 'targetLigstLevel']
@@ -262,7 +262,7 @@ class NodesManager {
         ...newLightInConfig,
         ...syncedInputs,
       };
-    } else if (device.configuration.mcuType === DeviceConfigurations.MCUTypes.NUTRITION_CONTROL) {
+    } else if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.NUTRITION_CONTROL) {
       // TODO;
     }
 

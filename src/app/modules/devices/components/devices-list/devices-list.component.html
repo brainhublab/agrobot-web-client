@@ -13,14 +13,14 @@
         <nz-list-item>
           <nz-card [nzTitle]="titleTemplate">
             <p *ngIf="item.description">{{item.description}}</p>
-            <nz-tag>{{item.mac_addr}}</nz-tag>
+            <nz-tag>MAC: {{item.mac_addr}}</nz-tag>
           </nz-card>
           <ng-template #titleTemplate>
             <a [routerLink]="['details', item.id]">
-              {{item.name}}
-              <i *ngIf="item.configuration?.isConfigured" nz-icon nzType="check-circle" nzTheme="twotone"
+              {{item.name || 'Black name'}}
+              <i *ngIf="item.esp_config?.isConfigured" nz-icon nzType="check-circle" nzTheme="twotone"
                 nzTwotoneColor="#52c41a" nz-tooltip nzTooltipTitle="Device is configured"></i>
-              <i *ngIf="!item.configuration?.isConfigured" nz-icon nzType="exclamation-circle" nzTheme="twotone"
+              <i *ngIf="!item.esp_config?.isConfigured" nz-icon nzType="exclamation-circle" nzTheme="twotone"
                 nzTwotoneColor="#faad14" nz-tooltip nzTooltipTitle="Warning: device is not configured"></i>
             </a>
           </ng-template>

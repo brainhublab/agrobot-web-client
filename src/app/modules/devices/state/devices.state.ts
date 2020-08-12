@@ -1,8 +1,10 @@
 
-import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { State, Action, StateContext, Selector, NgxsOnInit } from '@ngxs/store';
 import { IDevice } from '../../shared/litegraph/device.model';
 import { DeviceActions } from './devices.actions';
 import { DeviceConfigurations } from '../../shared/litegraph/config-types';
+import { Injectable } from '@angular/core';
+import { ApiClientService } from '../../shared/api/api-client.service';
 
 export class DevicesStateModel {
   devices: IDevice[];
@@ -12,44 +14,52 @@ export class DevicesStateModel {
   name: 'devices',
   defaults: {
     devices: [
-      {
-        id: 0,
-        name: 'Light cocntrol dev 1',
-        mac_addr: '3b:6e:82:1c:1f:ca',
-        description: 'first device ever',
-        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
-      },
-      {
-        id: 1,
-        name: 'Title 2',
-        mac_addr: 'd6:4e:e8:63:fa:41',
-        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.WATER_LEVEL]
-      },
-      {
-        id: 2,
-        name: 'Title 3',
-        mac_addr: '28:d4:0c:67:0f:4d',
-        configuration: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.NUTRITION_CONTROL]
-      },
-      {
-        id: 3,
-        name: 'Title 4',
-        mac_addr: 'b5:47:a5:f3:78:20'
-      },
-      {
-        id: 4,
-        name: 'Title 5',
-        mac_addr: 'bf:1a:5e:5c:52:09'
-      },
-      {
-        id: 5,
-        name: 'Title 6'
-      }
+      // {
+      //   id: 0,
+      //   name: 'Light cocntrol dev 1',
+      //   mac_addr: '3b:6e:82:1c:1f:ca',
+      //   description: 'first device ever',
+      //   esp_config: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
+      // },
+      // {
+      //   id: 1,
+      //   name: 'Title 2',
+      //   mac_addr: 'd6:4e:e8:63:fa:41',
+      //   esp_config: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.WATER_LEVEL]
+      // },
+      // {
+      //   id: 2,
+      //   name: 'Title 3',
+      //   mac_addr: '28:d4:0c:67:0f:4d',
+      //   esp_config: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.NUTRITION_CONTROL]
+      // },
+      // {
+      //   id: 3,
+      //   name: 'Title 4',
+      //   mac_addr: 'b5:47:a5:f3:78:20'
+      // },
+      // {
+      //   id: 4,
+      //   name: 'Title 5',
+      //   mac_addr: 'bf:1a:5e:5c:52:09'
+      // },
+      // {
+      //   id: 5,
+      //   name: 'Title 6'
+      // }
     ]
   }
 })
+@Injectable()
+export class DevicesState implements NgxsOnInit {
 
-export class DevicesState {
+  ngxsOnInit(ctx: StateContext<DevicesState>) {
+    ctx.dispatch(new DeviceActions.Reload());
+  }
+  constructor(
+    private apiClient: ApiClientService
+  ) { }
+
 
   @Selector()
   static getDevices(state: DevicesStateModel) {
@@ -58,7 +68,7 @@ export class DevicesState {
 
   @Selector()
   static getConfiguredDevices(state: DevicesStateModel) {
-    return state.devices.filter(v => v?.configuration?.isConfigured);
+    return state.devices.filter(v => v?.esp_config?.isConfigured);
   }
 
   @Selector()
@@ -74,6 +84,20 @@ export class DevicesState {
     patchState({
       devices: [...state.devices, device]
     });
+  }
+
+  @Action(DeviceActions.Reload)
+  async reload({ getState, patchState }: StateContext<DevicesStateModel>, { }: DeviceActions.Reload) {
+
+    try {
+      const devices = await this.apiClient.getControllers().toPromise();
+      const state = getState();
+      patchState({
+        devices
+      });
+    } catch (e) {
+      console.warn('Error reloading devices: ', e);
+    }
   }
 
   @Action(DeviceActions.Remove)

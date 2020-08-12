@@ -28,7 +28,7 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
   ];
 
   public get dirty() {
-    return this.deviceEditorComponent.dirty;
+    return this.deviceEditorComponent?.dirty;
   }
 
   constructor(
@@ -59,11 +59,11 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
       alert('Wrong config'); // TODO
       return;
     }
-    this.editDevice({ configuration: conf });
+    this.editDevice({ esp_config: conf });
   }
 
   public removeConfiguration() {
-    this.editDevice({ configuration: null });
+    this.editDevice({ esp_config: null });
   }
 
   public editDevice(pDevice: Partial<IDevice>) {

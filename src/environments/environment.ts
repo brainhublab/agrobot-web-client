@@ -2,8 +2,21 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-export const environment = {
-  production: false
+import { IAppEnv } from './type';
+
+export const environment: IAppEnv = {
+  production: false,
+  mqtt: {
+    hostname: 'localhost',
+    port: 9001,
+    path: '',
+    username: 'miagiUI',
+    password: 'VYW[k7E*'
+  },
+  api: {
+    url: 'http://localhost:5000/api',
+    token: 'JVYeLZpRQCtpNyTITfGh6OzXRFpYIrjZki_JVV5r',
+  }
 };
 
 /*
