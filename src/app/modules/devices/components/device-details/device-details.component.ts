@@ -1,10 +1,10 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { DevicesState } from '../../state/devices.state';
 import { map } from 'rxjs/operators';
-import { Device } from '../../../shared/litegraph/device.model';
-import { Observable } from 'rxjs';
+import { IDevice } from '../../../shared/litegraph/device.model';
+import { Observable, Subscription } from 'rxjs';
 import { DeviceActions } from '../../state/devices.actions';
 import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
 import { DeviceEditorComponent } from '../device-editor/device-editor.component';
@@ -14,11 +14,12 @@ import { DeviceEditorComponent } from '../device-editor/device-editor.component'
   templateUrl: './device-details.component.html',
   styleUrls: ['./device-details.component.scss']
 })
-export class DeviceDetailsComponent implements OnInit {
-  public device$: Observable<Device>;
+export class DeviceDetailsComponent implements OnInit, OnDestroy {
+  public device$: Observable<IDevice>;
   @ViewChild('deviceEditor') deviceEditorComponent: DeviceEditorComponent;
 
   private deviceID: number;
+  private paramMapSubscription: Subscription;
 
   public readonly deviceTemplates = [
     { name: 'Water level', value: DeviceConfigurations.MCUTypes.WATER_LEVEL },
@@ -36,7 +37,7 @@ export class DeviceDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(pm => {
+    this.paramMapSubscription = this.route.paramMap.subscribe(pm => {
       const deviceID = pm.get('deviceID');
       if (deviceID) {
         this.deviceID = parseInt(deviceID);
@@ -46,6 +47,10 @@ export class DeviceDetailsComponent implements OnInit {
           );
       }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.paramMapSubscription) { this.paramMapSubscription.unsubscribe(); }
   }
 
   public onTemplateChange(templateValue: DeviceConfigurations.MCUTypes) {
@@ -61,7 +66,7 @@ export class DeviceDetailsComponent implements OnInit {
     this.editDevice({ configuration: null });
   }
 
-  public editDevice(pDevice: Partial<Device>) {
+  public editDevice(pDevice: Partial<IDevice>) {
     return this.store
       .dispatch(new DeviceActions.Edit(
         this.deviceID,

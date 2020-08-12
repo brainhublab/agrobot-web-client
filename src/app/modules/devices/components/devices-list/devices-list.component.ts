@@ -1,5 +1,5 @@
 import { Component, OnInit, HostBinding } from '@angular/core';
-import { Device } from '../../../shared/litegraph/device.model';
+import { IDevice } from '../../../shared/litegraph/device.model';
 import { Store, Select } from '@ngxs/store';
 import { DeviceActions } from '../../state/devices.actions';
 import { DevicesState } from '../../state/devices.state';
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
   styleUrls: ['./devices-list.component.scss']
 })
 export class DevicesListComponent implements OnInit {
-  @Select(DevicesState.getDevices) devices$: Observable<Array<Device>>;
+  @Select(DevicesState.getDevices) devices$: Observable<Array<IDevice>>;
 
   constructor(private store: Store) { }
   ngOnInit(): void {

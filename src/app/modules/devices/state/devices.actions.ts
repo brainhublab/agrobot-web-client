@@ -1,4 +1,4 @@
-import { Device as DeviceModel } from '../../shared/litegraph/device.model';
+import { IDevice as DeviceModel } from '../../shared/litegraph/device.model';
 
 export namespace DeviceActions {
   export class Add {

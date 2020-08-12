@@ -1,12 +1,12 @@
 
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { Notification } from '../models/notification.model';
+import { INotification } from '../models/notification.model';
 import { NotificationsActions } from './notifications.actions';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Injectable } from '@angular/core';
 
 export class NotificationsStateModel {
-  notifications: Notification[];
+  notifications: INotification[];
 }
 
 @State<NotificationsStateModel>({
@@ -14,8 +14,10 @@ export class NotificationsStateModel {
   defaults: {
     notifications: [
       {
+        id: 0,
         title: 'Notification 0',
-        description: 'Test notification'
+        description: 'Test notification',
+        seen: false
       },
     ]
   }
@@ -49,6 +51,22 @@ export class NotificationsState {
   remove({ getState, patchState }: StateContext<NotificationsStateModel>, { id }: NotificationsActions.Remove) {
     patchState({
       notifications: getState().notifications.filter((a, i) => i !== id)
+    });
+  }
+
+  @Action(NotificationsActions.Seen)
+  makeSeen({ getState, patchState }: StateContext<NotificationsStateModel>, { id }: NotificationsActions.Seen) {
+    patchState({
+      notifications: getState().notifications.map(n => {
+        if (n.id === id) {
+          return {
+            ...n,
+            seen: true
+          };
+        }
+
+        return n;
+      })
     });
   }
 

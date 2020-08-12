@@ -12,7 +12,7 @@ export namespace DeviceConfigurations {
   /**
    * Device configuration interface
    */
-  export interface DeviceConfiguration {
+  export interface IDeviceConfiguration {
     mcuType: DeviceConfigurations.MCUTypes;
     title: string;
     isConfigured: boolean;
@@ -24,7 +24,7 @@ export namespace DeviceConfigurations {
   /**
    * Water Level inputs
    */
-  export interface WaterLevelInputs {
+  export interface IWaterLevelInputs {
     valve: number;
     levelPercents: number;
     PID: {
@@ -40,11 +40,11 @@ export namespace DeviceConfigurations {
   /**
    * WaterLevel device config
    */
-  export class WaterLevelConfig implements DeviceConfiguration {
+  export class WaterLevelConfig implements IDeviceConfiguration {
     readonly mcuType = DeviceConfigurations.MCUTypes.WATER_LEVEL;
     readonly title = 'Water level';
     isConfigured = true;
-    in: WaterLevelInputs = {
+    in: IWaterLevelInputs = {
       valve: 100,
       levelPercents: 100,
       PID: {
@@ -77,7 +77,7 @@ export namespace DeviceConfigurations {
   /**
    * Light control device cfg inputs
    */
-  export interface LightControlInputs {
+  export interface ILightControlInputs {
     lightMode: number;
     targetLigstLevel: number;
     currentTime: string;
@@ -87,11 +87,11 @@ export namespace DeviceConfigurations {
   /**
    * Light control device config
    */
-  export class LightControlConfig implements DeviceConfiguration {
+  export class LightControlConfig implements IDeviceConfiguration {
     public readonly mcuType = DeviceConfigurations.MCUTypes.LIGHT_CONTROL;
     public readonly title = 'Light control';
     public isConfigured = true;
-    public in: LightControlInputs = {
+    public in: ILightControlInputs = {
       lightMode: 100,
       targetLigstLevel: 100,
       currentTime: '12:30',
@@ -133,7 +133,7 @@ export namespace DeviceConfigurations {
   /**
    * Nutrition controlller dispanser
    */
-  export interface NutritionControlDispanser {
+  export interface INutritionControlDispanser {
     in: {
       nutritionMode: number;
       targetConcentration: number;
@@ -148,7 +148,7 @@ export namespace DeviceConfigurations {
   /**
    * Nutrition controller configuration
    */
-  export class NutritionControlConfig implements DeviceConfiguration {
+  export class NutritionControlConfig implements IDeviceConfiguration {
     readonly mcuType = DeviceConfigurations.MCUTypes.NUTRITION_CONTROL;
     readonly title = 'Nutrition control';
     isConfigured = true;

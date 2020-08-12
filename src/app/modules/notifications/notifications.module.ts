@@ -7,6 +7,7 @@ import { NgxsModule } from '@ngxs/store';
 import { NotificationsState } from './state/notifications.state';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
+import { NzListModule } from 'ng-zorro-antd/list';
 
 
 @NgModule({
@@ -15,6 +16,7 @@ import { NzNotificationModule } from 'ng-zorro-antd/notification';
     CommonModule,
     NotificationsRoutingModule,
     NzNotificationModule,
+    NzListModule,
     NgxsModule.forFeature([NotificationsState]),
     NzButtonModule,
   ]

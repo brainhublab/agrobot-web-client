@@ -1,9 +1,9 @@
-import { Component, OnInit, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { LGraph, LGraphCanvas, LiteGraph } from 'litegraph.js';
 import { Select } from '@ngxs/store';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
-import { Observable } from 'rxjs';
-import { Device } from 'src/app/modules/shared/litegraph/device.model';
+import { Observable, Subscription } from 'rxjs';
+import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
 import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
 
@@ -12,7 +12,7 @@ import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
-export class WorkspaceComponent implements OnInit, AfterViewInit {
+export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
   private graph: LGraph;
   private canvas: LGraphCanvas;
   private nodesManager = new NodesManager(
@@ -26,7 +26,8 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
   );
   dirty = false;
 
-  @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<Device>>;
+  @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<IDevice>>;
+  private configuredDevicesSub: Subscription;
 
   width = 1024;
   height = 720;
@@ -45,6 +46,12 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => this.initializeCanvas(), 10);
+  }
+
+  ngOnDestroy(): void {
+    if (this.configuredDevicesSub) {
+      this.configuredDevicesSub.unsubscribe();
+    }
   }
 
   private updateSize() {
@@ -66,7 +73,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit {
 
   private addNodes() {
     let lastOffset = 30;
-    this.configuredDevices$.subscribe((devices: Array<Device>) => {
+    this.configuredDevicesSub = this.configuredDevices$.subscribe((devices: Array<IDevice>) => {
       devices?.forEach((d, idx) => {
         const cfg = this.nodesManager.registerWsDeviceNode(d);
         const deviceNode = LiteGraph.createNode(cfg.type);

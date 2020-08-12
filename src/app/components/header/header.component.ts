@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.notificationsCounter$ = this.store.select(NotificationsState.getNotifications).pipe(map(nl => nl?.length));
+    this.notificationsCounter$ = this.store.select(NotificationsState.getNotifications).pipe(map(nl => nl?.filter(v => !v.seen).length));
   }
 
 }

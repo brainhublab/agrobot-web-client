@@ -15,7 +15,7 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: '/dashboard'
+    redirectTo: '/devices'
   },
   {
     path: '**', component: PageNotFoundComponent

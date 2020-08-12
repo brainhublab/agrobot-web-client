@@ -1,11 +1,11 @@
 
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { Device } from '../../shared/litegraph/device.model';
+import { IDevice } from '../../shared/litegraph/device.model';
 import { DeviceActions } from './devices.actions';
 import { DeviceConfigurations } from '../../shared/litegraph/config-types';
 
 export class DevicesStateModel {
-  devices: Device[];
+  devices: IDevice[];
 }
 
 @State<DevicesStateModel>({

@@ -1,9 +1,9 @@
 import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
-import { Device } from 'src/app/modules/shared/litegraph/device.model';
+import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { DeviceConfigurations } from './config-types';
 import { SerializedGraph } from './types';
 
-interface NodeConfig extends DeviceConfigurations.ILGraphDeviceNodeDescriptor {
+interface INodeConfig extends DeviceConfigurations.ILGraphDeviceNodeDescriptor {
   type: string;
   title: string;
 }
@@ -33,19 +33,19 @@ class NodesManager {
 
   }
 
-  public registerDeviceConfigurationNode = (device: Device) => {
+  public registerDeviceConfigurationNode = (device: IDevice) => {
     const cfg = this.getNodeConfig(device);
     this.registerNode(cfg);
     return cfg;
   }
 
-  public registerWsDeviceNode = (device: Device) => {
+  public registerWsDeviceNode = (device: IDevice) => {
     const cfg = this.getNodeConfig(device);
     this.registerNode(cfg, true);
     return cfg;
   }
 
-  private getNodeConfig(device: Device): NodeConfig {
+  private getNodeConfig(device: IDevice): INodeConfig {
     const deviceNodeDescriptor = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.configuration?.mcuType];
     return {
       type: this.getDeviceNodeType(device),
@@ -54,7 +54,7 @@ class NodesManager {
     };
   }
 
-  public getDeviceNodeType = (device: Device): string => {
+  public getDeviceNodeType = (device: IDevice): string => {
     return `${device.configuration.mcuType}/${device.id}`;
   }
 
@@ -81,7 +81,7 @@ class NodesManager {
     }
   }
 
-  private registerNode(cfg: NodeConfig, bindingMode: boolean = false) {
+  private registerNode(cfg: INodeConfig, bindingMode: boolean = false) {
     const that = this;
     function NodeConstructor() {
       // always serialize widgets
@@ -224,10 +224,10 @@ class NodesManager {
    * @returns New device configuration
    */
   public syncDeviceConfig(
-    device: Device,
+    device: IDevice,
     deviceNode: SerializedLGraphNode,
     serializedGraph: SerializedGraph
-  ): DeviceConfigurations.DeviceConfiguration {
+  ): DeviceConfigurations.IDeviceConfiguration {
     const oldConfig = { ...device.configuration };
     let newInConfig: any;
 
@@ -251,7 +251,7 @@ class NodesManager {
       ]);
       const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, propsMap);
 
-      const newLightInConfig: Partial<DeviceConfigurations.LightControlInputs> = { ...oldConfig.in };
+      const newLightInConfig: Partial<DeviceConfigurations.ILightControlInputs> = { ...oldConfig.in };
       // Update Mode
       newLightInConfig.lightMode = deviceNode.widgets_values[
         DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
@@ -267,7 +267,7 @@ class NodesManager {
     }
 
 
-    const newConfig: DeviceConfigurations.DeviceConfiguration = {
+    const newConfig: DeviceConfigurations.IDeviceConfiguration = {
       ...oldConfig, // preserve old
       in: {
         ...oldConfig.in, // preserve old cfgs

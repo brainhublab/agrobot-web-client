@@ -1,8 +1,11 @@
 <div class="page-container">
+  <nz-list nzBordered nzHeader="Notifications">
+    <nz-list-item *ngFor="let notification of notifications$ | async" (mouseenter)="seenNotification(notification)"
+      [class.seen]="notification.seen">
+      <span nz-typography><mark>{{ notification.title }}</mark></span>
+      {{ notification.description }}
+    </nz-list-item>
+  </nz-list>
   <button nz-button (click)="addNotification()">Add</button>
-  <ul class="notifications-list">
-    <li *ngFor="let notification of notifications$ | async">
-      {{notification.title}}: {{notification.description}}
-    </li>
-  </ul>
+
 </div>

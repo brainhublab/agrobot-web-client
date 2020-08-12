@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { LGraph, LiteGraph, LGraphCanvas } from 'litegraph.js';
-import { Device } from '../../../shared/litegraph/device.model';
+import { IDevice } from '../../../shared/litegraph/device.model';
 import { NodesManager } from '../../../shared/litegraph/nodes-manager';
 import { Store } from '@ngxs/store';
 import { DeviceActions } from '../../state/devices.actions';
@@ -19,7 +19,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
 
   @Input() width = 1024;
   @Input() height = 720;
-  @Input() device: Device;
+  @Input() device: IDevice;
   @Output() graphChanged = new EventEmitter<SerializedGraph>();
 
   public dirty = false;
@@ -80,10 +80,10 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
       .dispatch(new DeviceActions.Edit(
         this.device.id,
         { serialized_graph: JSON.stringify(serializedGraph), configuration: syncedDeviceConfiguration }
-      )).subscribe(_ => this.dirty = false);
+      )).pipe(first()).subscribe(_ => this.dirty = false);
   }
 
-  private syncDeviceConfiguration(device: Device, serializedGraph: SerializedGraph): DeviceConfigurations.DeviceConfiguration {
+  private syncDeviceConfiguration(device: IDevice, serializedGraph: SerializedGraph): DeviceConfigurations.IDeviceConfiguration {
     const deviceNode = serializedGraph.nodes.find(n => this.nodesManager.parseDeviceNodeType(n.type)?.id === device.id);
 
     const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
