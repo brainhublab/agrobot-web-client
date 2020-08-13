@@ -6,6 +6,11 @@ export namespace DeviceActions {
     constructor() { }
   }
 
+  export class LoadById {
+    static readonly type = '[DEVICE] LoadById';
+    constructor(public id: number) { }
+  }
+
   export class Add {
     static readonly type = '[DEVICE] Add';
 

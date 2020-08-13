@@ -8,7 +8,9 @@ import { DevicesState } from '../../state/devices.state';
 import { map, first } from 'rxjs/operators';
 import { DeviceConfigurations } from '../../../shared/litegraph/config-types';
 import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
+import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
 
+import lodash from 'lodash';
 
 @Component({
   selector: 'app-device-editor',
@@ -20,9 +22,10 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   @Input() width = 1024;
   @Input() height = 720;
   @Input() device: IDevice;
-  @Output() graphChanged = new EventEmitter<SerializedGraph>();
+  @Output() deviceChange = new EventEmitter<IDevice>();
 
   public dirty = false;
+  public loading = false;
 
   private graph: LGraph;
   private canvas: LGraphCanvas;
@@ -36,7 +39,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
 
   constructor(
     private readonly elRef: ElementRef,
-    private readonly store: Store,
+    private readonly apiClient: ApiClientService,
   ) {
     this.nodesManager.deleteNotAllowedNodes();
   }
@@ -47,7 +50,9 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.adjustCanvasSize();
-    this.canvas.adjustNodesSize();
+    if (this.canvas) {
+      this.canvas.adjustNodesSize();
+    }
   }
 
   private adjustCanvasSize() {
@@ -65,23 +70,37 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     this.canvas = new LGraphCanvas('#deviceCanvas', this.graph);
     this.canvas.canvas.addEventListener('mousedown', () => {
       // handle changes
-      this.dirty = true;
+      const serializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
+      if (!lodash.isEqual(this.device.graph, serializedGraph)) {
+        console.log(this.graph.serialize(), this.device.graph);
+        this.dirty = true;
+      }
     });
   }
 
   /**
    * Save serialized graph configuration
    */
-  public save() {
+  public async save() {
     const serializedGraph: SerializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
     const syncedDeviceConfiguration = this.syncDeviceConfiguration(this.device, serializedGraph);
 
+    try {
+      this.loading = true;
+      this.device = await this.apiClient.updateController({
+        ...this.device,
+        graph: serializedGraph, esp_config: syncedDeviceConfiguration
+      }).toPromise();
 
-    return this.store
-      .dispatch(new DeviceActions.Edit(
-        this.device.id,
-        { graph: serializedGraph, esp_config: syncedDeviceConfiguration }
-      )).pipe(first()).subscribe(_ => this.dirty = false);
+
+      this.deviceChange.emit(this.device);
+      this.loading = false;
+      this.dirty = false;
+    } catch (e) {
+      console.warn('Error updating controller', e);
+    }
+    // .dispatch(new DeviceActions.Edit(
+    // )).pipe(first()).subscribe(_ => this.dirty = false);
   }
 
   private syncDeviceConfiguration(device: IDevice, serializedGraph: SerializedGraph): DeviceConfigurations.IDeviceConfiguration {

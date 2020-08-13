@@ -22,6 +22,8 @@ import { FormsModule } from '@angular/forms';
 import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent],
@@ -42,6 +44,8 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
     NzDividerModule,
     NzSelectModule,
     NzModalModule,
+    NzSpinModule,
+    SharedModule,
     NgxsModule.forFeature(
       [DevicesState]
     )

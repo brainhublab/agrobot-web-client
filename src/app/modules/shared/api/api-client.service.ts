@@ -20,7 +20,19 @@ export class ApiClientService {
     return this.httpClient.get<ResponseType>(this.baseUrl + '/' + path + '/').pipe(first());
   }
 
+  public put<ResponseType>(path: string, body: any) {
+    return this.httpClient.put<ResponseType>(this.baseUrl + '/' + path + '/', body).pipe(first());
+  }
+
   getControllers() {
-    return this.get<Array<IDevice>>('controllers');
+    return this.get<Array<IDevice>>(`controllers`);
+  }
+
+  getControllerById(id: number) {
+    return this.get<IDevice>(`controllers/${id}`);
+  }
+
+  updateController(controller: IDevice) {
+    return this.put<IDevice>(`controllers/${controller.id}`, controller);
   }
 }

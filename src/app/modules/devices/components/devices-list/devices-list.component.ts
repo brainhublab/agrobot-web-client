@@ -12,9 +12,11 @@ import { Observable } from 'rxjs';
 })
 export class DevicesListComponent implements OnInit {
   @Select(DevicesState.getDevices) devices$: Observable<Array<IDevice>>;
+  @Select(DevicesState.getLoading) loading$: Observable<boolean>;
 
   constructor(private store: Store) { }
   ngOnInit(): void {
+    this.reload();
   }
 
   addDevice() {
@@ -22,6 +24,10 @@ export class DevicesListComponent implements OnInit {
       id: Math.round(Math.random() * 10),
       name: 'new one',
     }));
+  }
+
+  reload() {
+    this.store.dispatch(new DeviceActions.Reload());
   }
 
 }

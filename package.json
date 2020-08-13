@@ -21,6 +21,7 @@
     "@angular/router": "~9.1.11",
     "@ngxs/store": "^3.6.2",
     "litegraph.js": "^0.7.8",
+    "lodash": "^4.17.19",
     "ng-zorro-antd": "^9.3.0",
     "ngx-mqtt": "~6.13.3",
     "rxjs": "~6.5.4",

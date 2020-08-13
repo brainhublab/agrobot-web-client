@@ -1,12 +1,14 @@
 <div class="page-container">
-
   <div nz-row nzType="flex" nzJustify="space-between">
     <h2 (click)="addDevice()">Devices list</h2>
-    <button nz-button>
-      <a routerLink="/devices/workspace">See as a graph</a>
-    </button>
+    <div class="buttons">
+      <button nz-button (click)="reload()" [nzLoading]="(loading$ | async)">Reload</button>
+      <button nz-button>
+        <a routerLink="/devices/workspace">See as a graph</a>
+      </button>
+    </div>
   </div>
-  <nz-list nzGrid>
+  <nz-list nzGrid [nzLoading]="(loading$ | async)">
     <div nz-row [nzGutter]="16">
       <div nz-col [nzXXl]="8" [nzXl]="4" [nzLg]="6" [nzMd]="6" [nzSm]="12" [nzXs]="24"
         *ngFor="let item of devices$ | async">
@@ -17,7 +19,7 @@
           </nz-card>
           <ng-template #titleTemplate>
             <a [routerLink]="['details', item.id]">
-              {{item.name || 'Black name'}}
+              {{item.name || 'Blank name'}}
               <i *ngIf="item.esp_config?.isConfigured" nz-icon nzType="check-circle" nzTheme="twotone"
                 nzTwotoneColor="#52c41a" nz-tooltip nzTooltipTitle="Device is configured"></i>
               <i *ngIf="!item.esp_config?.isConfigured" nz-icon nzType="exclamation-circle" nzTheme="twotone"

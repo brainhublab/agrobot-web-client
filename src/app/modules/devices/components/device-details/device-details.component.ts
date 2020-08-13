@@ -1,13 +1,11 @@
 import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngxs/store';
-import { DevicesState } from '../../state/devices.state';
-import { map } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { IDevice } from '../../../shared/litegraph/device.model';
-import { Observable, Subscription } from 'rxjs';
-import { DeviceActions } from '../../state/devices.actions';
+import { Subscription } from 'rxjs';
 import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
 import { DeviceEditorComponent } from '../device-editor/device-editor.component';
+import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
 
 @Component({
   selector: 'app-device-details',
@@ -15,7 +13,9 @@ import { DeviceEditorComponent } from '../device-editor/device-editor.component'
   styleUrls: ['./device-details.component.scss']
 })
 export class DeviceDetailsComponent implements OnInit, OnDestroy {
-  public device$: Observable<IDevice>;
+  public device: IDevice;
+  public loading = true;
+
   @ViewChild('deviceEditor') deviceEditorComponent: DeviceEditorComponent;
 
   private deviceID: number;
@@ -33,7 +33,7 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly store: Store,
+    private readonly apiClient: ApiClientService
   ) { }
 
   ngOnInit(): void {
@@ -41,10 +41,11 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
       const deviceID = pm.get('deviceID');
       if (deviceID) {
         this.deviceID = parseInt(deviceID);
-        this.device$ = this.store.select(DevicesState.getByID)
-          .pipe(
-            map(ff => ff(this.deviceID))
-          );
+        this.apiClient.getControllerById(this.deviceID)
+          .pipe(first()).subscribe(d => {
+            this.device = d;
+            this.loading = false;
+          });
       }
     });
   }
@@ -59,6 +60,7 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
       alert('Wrong config'); // TODO
       return;
     }
+
     this.editDevice({ esp_config: conf });
   }
 
@@ -66,12 +68,10 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
     this.editDevice({ esp_config: null });
   }
 
-  public editDevice(pDevice: Partial<IDevice>) {
-    return this.store
-      .dispatch(new DeviceActions.Edit(
-        this.deviceID,
-        pDevice
-      ));
-
+  public async editDevice(pDevice: Partial<IDevice>) {
+    this.device = await this.apiClient.updateController({
+      ...this.device,
+      ...pDevice
+    }).toPromise();
   }
 }
