@@ -66,6 +66,8 @@ export class LineChartComponent implements OnInit, AfterViewInit {
       };
     });
 
+    this.drawAggregateFunValues();
+
     this.chart.axis('value', {
       label: {
         formatter: this.valueFormatter,

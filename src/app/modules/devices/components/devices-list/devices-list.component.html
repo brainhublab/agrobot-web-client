@@ -16,6 +16,7 @@
           <nz-card [nzTitle]="titleTemplate">
             <p *ngIf="item.description">{{item.description}}</p>
             <nz-tag>MAC: {{item.mac_addr}}</nz-tag>
+            <nz-tag *ngIf="item.esp_config?.mcuType" nzColor="#52b01a">{{item.esp_config.mcuType}}</nz-tag>
           </nz-card>
           <ng-template #titleTemplate>
             <a [routerLink]="['details', item.id]">
