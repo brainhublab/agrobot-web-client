@@ -26,28 +26,39 @@
             <p nz-typography nzEditable [nzContent]="device?.description"
               (nzContentChange)="editDevice({description: $event})"></p>
           </div>
-          <nz-divider nzText="Configuration"></nz-divider>
-
-          <div *ngIf="!device.esp_config?.mcuType">
-            <p>Please, select a template for esp_config:
-              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
-                (ngModelChange)="onTemplateChange($event)" [ngModel]="device.description">
-                <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTemplates"></nz-option>
-              </nz-select>
-            </p>
-          </div>
-          <div *ngIf="device.esp_config?.mcuType">
-            <p>This device is using
-              <nz-tag nzColor="#52b01a">{{device.esp_config.mcuType}}</nz-tag>
-              template.
-            </p>
-            <p>Tweak your esp_config:</p>
-            {{device.esp_config | json}}
-            <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
-            </app-device-editor>
-            <nz-divider></nz-divider>
-            <button nz-button nzDanger (click)="removeConfiguration()">Delete esp_config</button>
-          </div>
+          <nz-tabset>
+            <nz-tab nzTitle="Configuration">
+              <ng-template nz-tab>
+                <!-- <nz-divider nzText="Configuration"></nz-divider> -->
+                <div *ngIf="!device.esp_config?.mcuType">
+                  <p>Please, select a template for esp_config:
+                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
+                      (ngModelChange)="onTemplateChange($event)" [ngModel]="device.description">
+                      <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTemplates">
+                      </nz-option>
+                    </nz-select>
+                  </p>
+                </div>
+                <div *ngIf="device.esp_config?.mcuType">
+                  <p>This device is using
+                    <nz-tag nzColor="#52b01a">{{device.esp_config.mcuType}}</nz-tag>
+                    template.
+                  </p>
+                  <p>Tweak your esp_config:</p>
+                  {{device.esp_config | json}}
+                  <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
+                  </app-device-editor>
+                  <nz-divider></nz-divider>
+                  <button nz-button nzDanger (click)="removeConfiguration()">Delete esp_config</button>
+                </div>
+              </ng-template>
+            </nz-tab>
+            <nz-tab nzTitle="Charts">
+              <ng-template nz-tab>
+                <app-device-charts [device]="device"></app-device-charts>
+              </ng-template>
+            </nz-tab>
+          </nz-tabset>
 
 
 

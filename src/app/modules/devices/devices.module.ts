@@ -24,9 +24,11 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { SharedModule } from '../shared/shared.module';
+import { DeviceChartsComponent } from './components/device-charts/device-charts.component';
+import { ChartsModule } from 'projects/charts/src/src';
 
 @NgModule({
-  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent],
+  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent, DeviceChartsComponent],
   imports: [
     CommonModule,
     FormsModule,
@@ -46,6 +48,7 @@ import { SharedModule } from '../shared/shared.module';
     NzModalModule,
     NzSpinModule,
     SharedModule,
+    ChartsModule,
     NgxsModule.forFeature(
       [DevicesState]
     )

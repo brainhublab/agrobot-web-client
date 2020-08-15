@@ -109,11 +109,11 @@ export class LineChartComponent implements OnInit, AfterViewInit {
     // render
     this.chart.render();
 
-    interval(5000).subscribe(_ => {
+    interval(1000).subscribe(_ => {
       const date = new Date();
       const dateStr = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
 
-      this.addDataRow({ timestamp: dateStr, value: 40 });
+      this.addDataRow({ timestamp: dateStr, value: Math.random() * 100 });
     });
   }
 

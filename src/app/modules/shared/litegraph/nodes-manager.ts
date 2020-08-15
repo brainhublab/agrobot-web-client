@@ -272,7 +272,8 @@ class NodesManager {
       in: {
         ...oldConfig.in, // preserve old cfgs
         ...newInConfig,
-      }
+      },
+      isConfigured: true
     };
 
     return newConfig;

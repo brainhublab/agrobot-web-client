@@ -1,0 +1,18 @@
+<div *ngIf="!device?.esp_config?.isConfigured">
+  <h1 nz-typography style="text-align: center;">Device is not configured.</h1>
+</div>
+<div *ngIf="device?.esp_config?.isConfigured">
+  <div [ngSwitch]="device.esp_config.mcuType">
+    <div *ngSwitchCase="mcuTypes.WATER_LEVEL">
+      <h1 nz-typography style="text-align: center;">Water Level</h1>
+      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.WATER_LEVEL" [data]="waterLevelData"
+        [valueFormatter]="waterLevelFormatter"></lib-line-chart>
+    </div>
+    <div *ngSwitchCase="mcuTypes.LIGHT_CONTROL">
+      <h1 nz-typography style="text-align: center;">Light control</h1>
+      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.LIGHT_CONTROL" [data]="tempData"
+        [valueFormatter]="tempFormatter"></lib-line-chart>
+    </div>
+  </div>
+
+</div>
