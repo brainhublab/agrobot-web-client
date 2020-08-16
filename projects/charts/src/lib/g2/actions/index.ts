@@ -37,6 +37,7 @@ registerInteraction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, {
       action: [
         `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:filter`,
         `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:end`,
+        'sibling-x-filter:filter',
         'x-rect-mask:end',
         'x-rect-mask:hide',
         'reset-button:show',
@@ -49,6 +50,7 @@ registerInteraction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, {
       action: [
         `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:filter`,
         `${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:end`,
+        'sibling-x-filter:filter',
         'x-rect-mask:end',
         'x-rect-mask:hide',
         'reset-button:show',
@@ -58,9 +60,9 @@ registerInteraction(CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON, {
   ],
   rollback: [
     {
-      trigger: 'reset-button:click', action: [`${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:reset`, 'reset-button:hide', 'cursor:crosshair', 'tooltip:hide']
+      trigger: 'reset-button:click', action: [`${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:reset`, 'reset-button:hide', 'cursor:crosshair', 'tooltip:hide', 'sibling-x-filter:reset']
     },
-    { trigger: 'dblclick', action: [`${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:reset`, 'reset-button:hide', 'cursor:crosshair', 'tooltip:hide'] }
+    { trigger: 'dblclick', action: [`${CUSTOM_G2_ACTIONS.BRUSH_HORIZONTAL_RESET_BUTTON}:reset`, 'reset-button:hide', 'cursor:crosshair', 'tooltip:hide', 'sibling-x-filter:reset'] }
 
   ],
 });
