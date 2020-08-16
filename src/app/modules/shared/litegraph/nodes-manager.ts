@@ -129,11 +129,16 @@ class NodesManager {
     // setup execution
     NodeConstructor.prototype.onExecute = function () {
       // for each executor
+      console.log('exec: ', cfg.executors);
       cfg.executors?.forEach((ex) => {
         // get values (arguments for a reducer)
         const values = ex.inSlots.map(slotIdx => this.getInputData(slotIdx));
-        this.setOutputData(ex.outSlot, ex.reducer(values));
+        const result = ex.reducer(values);
+        console.log(`set ${ex.outSlot} to `, result);
+        this.setOutputData(ex.outSlot, result);
       });
+
+      this.boxcolor = this.boxcolor == '#AFA' ? '#6C6' : '#AFA';
     };
 
 

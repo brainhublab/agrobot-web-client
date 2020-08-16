@@ -308,6 +308,9 @@ export namespace DeviceConfigurations {
         { name: 'current_concentration', type: 'number', label: 'Current concentration' },
       ],
       triggers: [
+      ],
+      executors: [
+        { inSlots: [0], outSlot: 1, reducer: (values) => values.shift() },
       ]
     },
     [DeviceConfigurations.MCUTypes.WATER_LEVEL]: {
@@ -326,6 +329,9 @@ export namespace DeviceConfigurations {
         { type: 'calibrate', name: 'Calibrate', handler: (action, param) => console.log('calibrate', action, param) },
         { type: 'open_gate', name: 'Open gate', handler: (action, param) => console.log('open_gate', action, param) },
         { type: 'close_gate', name: 'Close gate', handler: (action, param) => console.log('close gate', action, param) },
+      ],
+      executors: [
+        { inSlots: [0], outSlot: 0, reducer: (values) => values.shift() },
       ]
     }
   };

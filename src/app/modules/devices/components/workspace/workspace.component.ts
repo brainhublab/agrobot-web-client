@@ -6,6 +6,7 @@ import { Observable, Subscription } from 'rxjs';
 import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
 import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
+import { MqttNodesService } from './mqtt-nodes.service';
 
 @Component({
   selector: 'app-workspace',
@@ -38,10 +39,13 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.canvas.adjustNodesSize();
   }
 
-  constructor() { }
+  constructor(
+    private readonly mqttNodes: MqttNodesService
+  ) { }
 
   ngOnInit(): void {
     this.nodesManager.deleteNotAllowedNodes();
+    this.mqttNodes.register();
   }
 
   ngAfterViewInit() {
@@ -84,6 +88,17 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  public started = false;
+
+  public toggle() {
+    if (this.started) {
+      this.graph.stop();
+    } else {
+      this.graph.start(1000);
+    }
+
+    this.started = !this.started;
+  }
   public save() {
     const serializedGraph: SerializedGraph = this.graph.serialize();
 
