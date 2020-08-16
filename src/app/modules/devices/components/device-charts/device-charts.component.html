@@ -5,13 +5,21 @@
   <div [ngSwitch]="device.esp_config.mcuType">
     <div *ngSwitchCase="mcuTypes.WATER_LEVEL">
       <h1 nz-typography style="text-align: center;">Water Level</h1>
-      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.WATER_LEVEL" [data]="waterLevelData"
-        [valueFormatter]="waterLevelFormatter"></lib-line-chart>
+      <div class="filters">
+        <nz-range-picker [nzRanges]="datePickerRanges" nzShowTime nzFormat="yyyy/MM/dd HH:mm:ss" ngModel
+          (ngModelChange)="onDateRangeChange($event)"></nz-range-picker>
+      </div>
+      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.WATER_LEVEL" [dataSubject]="dataSubject"
+        [valueFormatter]="waterLevelFormatter" [dateRange]="dateRange"></lib-line-chart>
     </div>
     <div *ngSwitchCase="mcuTypes.LIGHT_CONTROL">
       <h1 nz-typography style="text-align: center;">Light control</h1>
-      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.LIGHT_CONTROL" [data]="tempData"
-        [valueFormatter]="tempFormatter"></lib-line-chart>
+      <div class="filters">
+        <nz-range-picker [nzRanges]="datePickerRanges" nzShowTime nzFormat="yyyy/MM/dd HH:mm:ss" ngModel
+          (ngModelChange)="onDateRangeChange($event)"></nz-range-picker>
+      </div>
+      <lib-line-chart *ngIf="device.esp_config.mcuType === mcuTypes.LIGHT_CONTROL" [dataSubject]="dataSubject"
+        [valueFormatter]="tempFormatter" [dateRange]="dateRange"></lib-line-chart>
     </div>
   </div>
 

@@ -1,10 +1,13 @@
-import { Component, OnInit, AfterViewInit, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, Input, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 
 import { Chart, View } from '@antv/g2';
 import { CUSTOM_G2_ACTIONS } from '../../g2/actions/config';
 import DataSet from '@antv/data-set';
 import { drawUniformLine } from '../../g2/utils';
-import { interval } from 'rxjs';
+import { interval, BehaviorSubject, Subscription } from 'rxjs';
+import { FilterCondition } from '@antv/g2/lib/interface';
+import { parse as parseDate } from 'date-fns';
+import { skip } from 'rxjs/operators';
 
 
 export type LineChartDataRow = { timestamp: string, value: number };
@@ -15,13 +18,15 @@ export type LineChartData = Array<LineChartDataRow>;
   templateUrl: './line-chart.component.html',
   styleUrls: ['./line-chart.component.scss']
 })
-export class LineChartComponent implements OnInit, AfterViewInit {
+export class LineChartComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
   private chart: Chart;
   private slider: View;
 
   @Input() maxValue: number = null;
   @Input() minValue: number = null;
-  @Input() data: LineChartData = [];
+  @Input() dateRange: [Date, Date];
+  @Input() dataSubject: BehaviorSubject<LineChartData>;
+  private dataSub: Subscription;
 
   private dv: any;
   @Input() valueFormatter = (val) => val.toPrecision(3);
@@ -35,9 +40,15 @@ export class LineChartComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
   }
 
+  ngOnDestroy(): void {
+    if (this.dataSub) {
+      this.dataSub.unsubscribe();
+    }
+  }
+
   ngAfterViewInit(): void {
     const ds = new DataSet();
-    this.dv = ds.createView().source(this.data);
+    this.dv = ds.createView().source(this.dataSubject.getValue());
 
     this.chart = new Chart({
       container: this.elRef.nativeElement,
@@ -102,20 +113,44 @@ export class LineChartComponent implements OnInit, AfterViewInit {
     });
 
     // slider
-    // this.chart.option('slider', {
+    // this.slider = this.chart.option('slider', {
     //   height: 50,
     // });
 
     // render
     this.chart.render();
 
-    interval(1000).subscribe(_ => {
-      const date = new Date();
-      const dateStr = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-
-      this.addDataRow({ timestamp: dateStr, value: Math.random() * 100 });
+    this.dataSub = this.dataSubject.pipe(skip(1)).subscribe(newData => {
+      newData.forEach(this.addDataRow.bind(this));
     });
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.dateRange?.currentValue !== changes.dateRange?.previousValue) {
+      const xScale = this.chart.getXScale();
+      this.filterView(this.chart, xScale.field, null);
+
+      if (this.dateRange?.length === 2) {
+        const filterFn = (dateString) => {
+          if (this.dateRange) {
+            const date = parseDate(dateString, 'HH:mm:ss yyyy-MM-dd', new Date());
+            return (date >= this.dateRange[0]) && (date <= this.dateRange[1]);
+          } else {
+            return true;
+          }
+        };
+
+        this.filterView(this.chart, xScale.field, filterFn);
+      }
+    }
+
+  }
+
+  private filterView(view: View, field: string, filter: FilterCondition) {
+    view.filter(field, filter);
+  }
+
+
 
   /**
    * Adds new data row to existing data view and updates the chart

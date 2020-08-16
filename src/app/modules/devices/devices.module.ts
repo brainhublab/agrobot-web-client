@@ -23,6 +23,7 @@ import { DeviceEditorComponent } from './components/device-editor/device-editor.
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { SharedModule } from '../shared/shared.module';
 import { DeviceChartsComponent } from './components/device-charts/device-charts.component';
 import { ChartsModule } from 'projects/charts/src/src';
@@ -47,6 +48,7 @@ import { ChartsModule } from 'projects/charts/src/src';
     NzSelectModule,
     NzModalModule,
     NzSpinModule,
+    NzDatePickerModule,
     SharedModule,
     ChartsModule,
     NgxsModule.forFeature(
