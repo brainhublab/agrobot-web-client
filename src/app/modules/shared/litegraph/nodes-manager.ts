@@ -139,7 +139,6 @@ class NodesManager {
         const that = this;
         this._dataSubscription = dataObservable.subscribe(data => {
           that.boxcolor = '#AFA';
-          console.log('new datA: ', data);
           that.triggerSlot(0, data);
           that._last_received_data = data;
         });
@@ -168,7 +167,6 @@ class NodesManager {
       //   // get values (arguments for a reducer)
       //   const values = ex.inSlots.map(slotIdx => this.getInputData(slotIdx));
       //   const result = ex.reducer(values);
-      //   console.log(`set ${ex.outSlot} to `, result);
       //   this.setOutputData(ex.outSlot, result);
       // });
 

@@ -81,7 +81,6 @@ export class DevicesState implements NgxsOnInit {
   async loadById({ getState, patchState }: StateContext<DevicesStateModel>, { id }: DeviceActions.LoadById) {
     try {
       const device = await this.apiClient.getControllerById(id).toPromise();
-      console.log(device)
       patchState({
         devicesById: getState().devicesById.set(id, device),
         loading: false,

@@ -81,7 +81,6 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
         const date = new Date();
         const dateStr = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getFullYear()}-${addZ(date.getMonth() + 1)}-${date.getDate()}`;
 
-        console.log(dateStr);
         this.dataSubject.next([
           { timestamp: dateStr, value: Math.random() * 100 }
         ]);
@@ -98,7 +97,5 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
 
     // TODO: maybe reload data?
     this.dateRange = [start, end];
-
-    console.log(start.toString(), end.toString());
   }
 }

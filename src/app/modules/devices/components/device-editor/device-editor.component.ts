@@ -62,7 +62,6 @@ export class DeviceEditorComponent extends LiteGraphCanvasComponent implements A
     // handle changes
     const serializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
     if (!lodash.isEqual(this.device.graph, serializedGraph)) {
-      console.log(this.graph.serialize(), this.device.graph);
       this.dirty = true;
     }
   }
