@@ -45,7 +45,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.nodesManager.deleteNotAllowedNodes();
-    this.mqttNodes.register();
+    this.mqttNodes.registerCustomNodes();
   }
 
   ngAfterViewInit() {
@@ -79,7 +79,7 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
     let lastOffset = 30;
     this.configuredDevicesSub = this.configuredDevices$.subscribe((devices: Array<IDevice>) => {
       devices?.forEach((d, idx) => {
-        const cfg = this.nodesManager.registerWsDeviceNode(d);
+        const cfg = this.nodesManager.registerWsDeviceNode(d, this.mqttNodes.getDeviceDataObservable(d));
         const deviceNode = LiteGraph.createNode(cfg.type);
         deviceNode.pos = [lastOffset, 200];
         lastOffset += deviceNode.computeSize()[0] + 50;

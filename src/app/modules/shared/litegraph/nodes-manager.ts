@@ -2,10 +2,14 @@ import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.j
 import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { DeviceConfigurations } from './config-types';
 import { SerializedGraph } from './types';
+import { Observable } from 'rxjs';
+
+type INodeData = string;
 
 interface INodeConfig extends DeviceConfigurations.ILGraphDeviceNodeDescriptor {
   type: string;
   title: string;
+  mac: string;
 }
 
 
@@ -33,15 +37,15 @@ class NodesManager {
 
   }
 
-  public registerDeviceConfigurationNode = (device: IDevice) => {
+  public registerDeviceConfigurationNode = (device: IDevice, dataObservable?: Observable<string>) => {
     const cfg = this.getNodeConfig(device);
-    this.registerNode(cfg);
+    this.registerNode(cfg, false, dataObservable);
     return cfg;
   }
 
-  public registerWsDeviceNode = (device: IDevice) => {
+  public registerWsDeviceNode = (device: IDevice, dataObservable?: Observable<string>) => {
     const cfg = this.getNodeConfig(device);
-    this.registerNode(cfg, true);
+    this.registerNode(cfg, true, dataObservable);
     return cfg;
   }
 
@@ -50,6 +54,7 @@ class NodesManager {
     return {
       type: this.getDeviceNodeType(device),
       title: `${device.name} (${device.esp_config.mcuType}, ${device.id})`,
+      mac: device.mac_addr,
       ...deviceNodeDescriptor,
     };
   }
@@ -81,11 +86,13 @@ class NodesManager {
     }
   }
 
-  private registerNode(cfg: INodeConfig, bindingMode: boolean = false) {
+  private registerNode(cfg: INodeConfig, bindingMode: boolean = false, dataObservable?: Observable<INodeData>) {
     const that = this;
     function NodeConstructor() {
       // always serialize widgets
       this.serialize_widgets = true;
+      this._dataSubscription = null;
+      this._last_received_data = '';
 
       // add inputs
       cfg.inputs.forEach(i => {
@@ -126,17 +133,36 @@ class NodesManager {
 
     NodeConstructor.title = cfg.title;
 
+
+    NodeConstructor.prototype.subscribeToData = function () {
+      if (dataObservable) {
+        const that = this;
+        this._dataSubscription = dataObservable.subscribe(data => {
+          that.boxcolor = '#AFA';
+          that.triggerSlot(0, data);
+          that._last_received_data = data;
+        });
+      }
+    };
+
     // setup execution
     NodeConstructor.prototype.onExecute = function () {
+      // process data subscription
+      if (!this._dataSubscription) {
+        this.subscribeToData();
+      } else {
+        // TODO: parse string and setOuputData for each output slot using mqtt msg
+        this.setOutputData(0, this._last_received_data);
+      }
+
       // for each executor
-      console.log('exec: ', cfg.executors);
-      cfg.executors?.forEach((ex) => {
-        // get values (arguments for a reducer)
-        const values = ex.inSlots.map(slotIdx => this.getInputData(slotIdx));
-        const result = ex.reducer(values);
-        console.log(`set ${ex.outSlot} to `, result);
-        this.setOutputData(ex.outSlot, result);
-      });
+      // cfg.executors?.forEach((ex) => {
+      //   // get values (arguments for a reducer)
+      //   const values = ex.inSlots.map(slotIdx => this.getInputData(slotIdx));
+      //   const result = ex.reducer(values);
+      //   console.log(`set ${ex.outSlot} to `, result);
+      //   this.setOutputData(ex.outSlot, result);
+      // });
 
       this.boxcolor = this.boxcolor == '#AFA' ? '#6C6' : '#AFA';
     };

@@ -11,6 +11,7 @@ import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
 import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
 
 import lodash from 'lodash';
+import { MqttNodesService } from '../workspace/mqtt-nodes.service';
 
 @Component({
   selector: 'app-device-editor',
@@ -40,6 +41,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
   constructor(
     private readonly elRef: ElementRef,
     private readonly apiClient: ApiClientService,
+    private readonly mqttNodesService: MqttNodesService
   ) {
     this.nodesManager.deleteNotAllowedNodes();
   }
@@ -119,7 +121,10 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
    * Restore or construct graph for the device
    */
   private constructGraph() {
-    this.nodesManager.registerDeviceConfigurationNode(this.device);
+    this.nodesManager.registerDeviceConfigurationNode(
+      this.device,
+      this.mqttNodesService.getDeviceDataObservable(this.device)
+    );
 
     if (this.device.graph?.nodes) {
       // use old graph
