@@ -1,35 +1,39 @@
-import { Component, OnInit, Input, AfterViewInit, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
-import { LGraph, LiteGraph, LGraphCanvas } from 'litegraph.js';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { LiteGraph } from 'litegraph.js';
+import lodash from 'lodash';
+import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
+import { LiteGraphCanvasComponent } from 'src/app/modules/shared/canvas.component';
+import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
+import { DeviceConfigurations } from '../../../shared/litegraph/config-types';
 import { IDevice } from '../../../shared/litegraph/device.model';
 import { NodesManager } from '../../../shared/litegraph/nodes-manager';
-import { Store } from '@ngxs/store';
-import { DeviceActions } from '../../state/devices.actions';
-import { DevicesState } from '../../state/devices.state';
-import { map, first } from 'rxjs/operators';
-import { DeviceConfigurations } from '../../../shared/litegraph/config-types';
-import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
-import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
+import { MqttNodesService } from '../../services/mqtt-nodes.service';
 
-import lodash from 'lodash';
-import { MqttNodesService } from '../workspace/mqtt-nodes.service';
 
 @Component({
   selector: 'app-device-editor',
   templateUrl: './device-editor.component.html',
   styleUrls: ['./device-editor.component.scss']
 })
-export class DeviceEditorComponent implements OnInit, AfterViewInit {
+export class DeviceEditorComponent extends LiteGraphCanvasComponent implements AfterViewInit {
+  // override
+  protected canvasElementID = '#deviceCanvas';
 
-  @Input() width = 1024;
-  @Input() height = 720;
+  /**
+   * Device instance
+   */
   @Input() device: IDevice;
+  /**
+   * Event fired after device changes
+   */
   @Output() deviceChange = new EventEmitter<IDevice>();
 
-  public dirty = false;
+  /**
+   * Loading indicator
+   */
   public loading = false;
 
-  private graph: LGraph;
-  private canvas: LGraphCanvas;
+  // nm
   private nodesManager = new NodesManager([
     'basic/const',
     'basic/boolean',
@@ -43,41 +47,31 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     private readonly apiClient: ApiClientService,
     private readonly mqttNodesService: MqttNodesService
   ) {
+    super();
     this.nodesManager.deleteNotAllowedNodes();
   }
 
-  ngOnInit(): void {
-  }
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.adjustCanvasSize();
-    if (this.canvas) {
-      this.canvas.adjustNodesSize();
-    }
-  }
-
-  private adjustCanvasSize() {
+  // override
+  protected recalculateCanvasSize() {
     this.width = this.elRef.nativeElement.offsetWidth;
     this.height = this.elRef.nativeElement.offsetHeight;
   }
 
-  /**
-   * Init Lgraph and canvas
-   */
-  private initializeCanvas() {
-    this.adjustCanvasSize();
-    this.graph = new LGraph();
+  // override
+  protected onCanvasMouseDownSideEffect() {
+    // handle changes
+    const serializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
+    if (!lodash.isEqual(this.device.graph, serializedGraph)) {
+      console.log(this.graph.serialize(), this.device.graph);
+      this.dirty = true;
+    }
+  }
 
-    this.canvas = new LGraphCanvas('#deviceCanvas', this.graph);
-    this.canvas.canvas.addEventListener('mousedown', () => {
-      // handle changes
-      const serializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
-      if (!lodash.isEqual(this.device.graph, serializedGraph)) {
-        console.log(this.graph.serialize(), this.device.graph);
-        this.dirty = true;
-      }
-    });
+  // override
+  protected afterGraphInitialized() {
+    if (this.device) {
+      this.constructGraph();
+    }
   }
 
   /**
@@ -105,6 +99,12 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     // )).pipe(first()).subscribe(_ => this.dirty = false);
   }
 
+  /**
+   * Generated new device configuration using serialized graph & previous device configuration
+   * @param device device instance
+   * @param serializedGraph lg serialized graph
+   * @returns new device configuration
+   */
   private syncDeviceConfiguration(device: IDevice, serializedGraph: SerializedGraph): DeviceConfigurations.IDeviceConfiguration {
     const deviceNode = serializedGraph.nodes.find(n => this.nodesManager.parseDeviceNodeType(n.type)?.id === device.id);
 
@@ -117,6 +117,7 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     }
 
   }
+
   /**
    * Restore or construct graph for the device
    */
@@ -141,13 +142,5 @@ export class DeviceEditorComponent implements OnInit, AfterViewInit {
     this.graph.start();
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.initializeCanvas();
-      if (this.device) {
-        this.constructGraph();
-      }
-    }, 10);
-  }
 
 }

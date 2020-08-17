@@ -1,21 +1,26 @@
-import { Component, OnInit, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
-import { LGraph, LGraphCanvas, LiteGraph } from 'litegraph.js';
+import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { Select } from '@ngxs/store';
-import { DevicesState } from 'src/app/modules/devices/state/devices.state';
+import { LiteGraph } from 'litegraph.js';
 import { Observable, Subscription } from 'rxjs';
+import { DevicesState } from 'src/app/modules/devices/state/devices.state';
+import { LiteGraphCanvasComponent } from 'src/app/modules/shared/canvas.component';
 import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
-import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
-import { MqttNodesService } from './mqtt-nodes.service';
+import { MqttNodesService } from '../../services/mqtt-nodes.service';
+
 
 @Component({
   selector: 'app-workspace',
   templateUrl: './workspace.component.html',
   styleUrls: ['./workspace.component.scss']
 })
-export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
-  private graph: LGraph;
-  private canvas: LGraphCanvas;
+export class WorkspaceComponent extends LiteGraphCanvasComponent implements AfterViewInit, OnDestroy {
+  // override
+  protected canvasElementID = '#workspaceCanvas';
+
+  /**
+   * Nodes manager instance
+   */
   private nodesManager = new NodesManager(
     [
       'basic/const',
@@ -25,31 +30,23 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
       'widget/combo',
     ]
   );
-  dirty = false;
 
+  /**
+   * Configured devices observable
+   */
   @Select(DevicesState.getConfiguredDevices) configuredDevices$: Observable<Array<IDevice>>;
+  /**
+   * configuredDevices$ subscription
+   */
   private configuredDevicesSub: Subscription;
-
-  width = 1024;
-  height = 720;
-
-  @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.updateSize();
-    this.canvas.adjustNodesSize();
-  }
 
   constructor(
     private readonly mqttNodes: MqttNodesService
-  ) { }
+  ) {
+    super();
 
-  ngOnInit(): void {
     this.nodesManager.deleteNotAllowedNodes();
     this.mqttNodes.registerCustomNodes();
-  }
-
-  ngAfterViewInit() {
-    setTimeout(() => this.initializeCanvas(), 10);
   }
 
   ngOnDestroy(): void {
@@ -58,24 +55,15 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private updateSize() {
-    this.width = window.innerWidth - 0;
-    this.height = window.innerHeight - 48;
+  // override
+  protected afterGraphInitialized() {
+    this.addConfiguredDevicesNodes();
   }
 
-  private initializeCanvas() {
-    this.updateSize();
-    this.graph = new LGraph();
-
-    this.canvas = new LGraphCanvas('#workspaceCanvas', this.graph);
-    this.canvas.canvas.addEventListener('mousedown', () => {
-      // handle changes
-      this.dirty = true;
-    });
-    this.addNodes();
-  }
-
-  private addNodes() {
+  /**
+   * Add LG node for each configured device
+   */
+  private addConfiguredDevicesNodes() {
     let lastOffset = 30;
     this.configuredDevicesSub = this.configuredDevices$.subscribe((devices: Array<IDevice>) => {
       devices?.forEach((d, idx) => {
@@ -88,21 +76,13 @@ export class WorkspaceComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  public started = false;
 
-  public toggle() {
-    if (this.started) {
-      this.graph.stop();
-    } else {
-      this.graph.start(1000);
-    }
-
-    this.started = !this.started;
-  }
+  /**
+   * Save serialized graph
+   * TODO: implement (backend & db tables too)
+   */
   public save() {
-    const serializedGraph: SerializedGraph = this.graph.serialize();
-
-    console.log('serializd: ', serializedGraph);
+    // const serializedGraph: SerializedGraph = this.graph.serialize();
     this.dirty = false;
   }
 

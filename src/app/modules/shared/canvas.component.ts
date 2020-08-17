@@ -1,0 +1,104 @@
+import { LGraph, LGraphCanvas } from 'litegraph.js';
+import { Input, HostListener, AfterViewInit } from '@angular/core';
+
+export abstract class LiteGraphCanvasComponent implements AfterViewInit {
+  /**
+   * Is Canvas dirty
+   */
+  public dirty = false;
+  /**
+   * Litegraph graph live mode
+   */
+  public started = false;
+  /**
+   * LG graph instance
+   */
+  protected graph: LGraph;
+  /**
+   * LG canvas instance
+   */
+  protected canvas: LGraphCanvas;
+
+  /**
+   * Canvas html element ID
+   */
+  protected abstract canvasElementID: string;
+
+  /**
+   * Compoentn and canvas size
+   */
+  @Input() width = 1024;
+  @Input() height = 720;
+
+  /**
+   * update canvas size on window resize
+   * @param event resize event
+   */
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.recalculateCanvasSize();
+    if (this.canvas) {
+      this.canvas.adjustNodesSize();
+    }
+  }
+
+  /**
+   * Update dimensions
+   */
+  protected recalculateCanvasSize() {
+    this.width = window.innerWidth - 0;
+    this.height = window.innerHeight - 48;
+  }
+
+  /**
+   * initialize canvas
+   */
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.initializeCanvas();
+      this.afterGraphInitialized();
+    }, 10);
+  }
+
+  /**
+   * Start / stop litegraph execution
+   */
+  public toggleLiteGraphLiveMode() {
+    if (this.started) {
+      this.graph.stop();
+    } else {
+      this.graph.start(1000);
+    }
+
+    // toggle flag
+    this.started = !this.started;
+  }
+
+
+  /**
+   * Called after graph initialized
+   */
+  protected abstract afterGraphInitialized(): void;
+
+  /**
+   * Init Lgraph and canvas
+   */
+  private initializeCanvas() {
+    this.recalculateCanvasSize();
+    this.graph = new LGraph();
+
+    this.canvas = new LGraphCanvas(this.canvasElementID, this.graph);
+    this.canvas.canvas.addEventListener('mousedown', () => {
+      // handle changes
+      this.onCanvasMouseDownSideEffect();
+    });
+  }
+
+  /**
+   * called after mousedown event on the canvas
+   */
+  protected onCanvasMouseDownSideEffect() {
+    this.dirty = true;
+  }
+
+}
