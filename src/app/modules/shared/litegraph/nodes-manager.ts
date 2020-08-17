@@ -139,9 +139,17 @@ class NodesManager {
         const that = this;
         this._dataSubscription = dataObservable.subscribe(data => {
           that.boxcolor = '#AFA';
+          console.log('new datA: ', data);
           that.triggerSlot(0, data);
           that._last_received_data = data;
         });
+      }
+    };
+
+    NodeConstructor.prototype.unsubscribeFromData = function () {
+      if (this._dataSubscription) {
+        this._dataSubscription.unsubscribe();
+        this._dataSubscription = null;
       }
     };
 
@@ -192,7 +200,12 @@ class NodesManager {
     };
 
 
+    NodeConstructor.prototype.onStop = function () {
+      this.unsubscribeFromData();
+    }
+
     NodeConstructor.prototype.onRemoved = function () {
+      this.unsubscribeFromData();
       that.multitonNodes.delete(cfg.type);
     };
 

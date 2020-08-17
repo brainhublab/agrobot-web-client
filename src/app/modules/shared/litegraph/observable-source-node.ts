@@ -46,6 +46,21 @@ export const registerLGObservableSourceNode = (dataObservable: Observable<string
     });
   };
 
+  LGObservableSourceNode.prototype.unsubscribeFromData = function () {
+    if (this._dataSubscription) {
+      this._dataSubscription.unsubscribe();
+      this._dataSubscription = null;
+    }
+  };
+
+  LGObservableSourceNode.prototype.onStop = function () {
+    this.unsubscribeFromData();
+  };
+
+  LGObservableSourceNode.prototype.onRemoved = function () {
+    this.unsubscribeFromData();
+  };
+
   LiteGraph.registerNodeType('source/observable', LGObservableSourceNode as any);
 
 }
