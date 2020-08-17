@@ -139,7 +139,6 @@ export class DeviceEditorComponent extends LiteGraphCanvasComponent implements A
       this.nodesManager.createSourceNodesForNodeInputs(deviceNode, this.graph);
     }
 
-    this.graph.start();
   }
 
 
