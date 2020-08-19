@@ -3,9 +3,9 @@ import { Select } from '@ngxs/store';
 import { LiteGraph } from 'litegraph.js';
 import { Observable, Subscription } from 'rxjs';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
-import { LiteGraphCanvasComponent } from 'src/app/modules/shared/canvas.component';
-import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
-import { NodesManager } from 'src/app/modules/shared/litegraph/nodes-manager';
+import { LiteGraphCanvasComponent } from 'src/app/modules/core/components/canvas.component';
+import { IDevice } from 'src/app/modules/core/models/device.model';
+import { NodesManager } from 'src/app/modules/core/litegraph/nodes-manager';
 import { MqttNodesService } from '../../services/mqtt-nodes.service';
 
 

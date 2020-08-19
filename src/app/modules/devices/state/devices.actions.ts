@@ -1,4 +1,4 @@
-import { IDevice as DeviceModel } from '../../shared/litegraph/device.model';
+import { IDevice as DeviceModel } from '../../core/models/device.model';
 
 export namespace DeviceActions {
   export class Reload {

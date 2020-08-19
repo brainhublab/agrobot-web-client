@@ -2,9 +2,9 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { endOfDay, endOfHour, endOfMonth, endOfWeek, startOfDay, startOfMonth, startOfWeek, subHours, subMinutes } from 'date-fns';
 import { LineChartData } from 'projects/charts/src/lib/components/line-chart/line-chart.component';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
-import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
-import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
-import { UIMqttService } from 'src/app/modules/shared/mqtt/mqtt.service';
+import { DeviceConfigurations } from 'src/app/modules/core/litegraph/config-types';
+import { IDevice } from 'src/app/modules/core/models/device.model';
+import { UIMqttService } from 'src/app/modules/core/services/mqtt/mqtt.service';
 
 
 const addZ = (n) => n < 10 ? '0' + n : '' + n;

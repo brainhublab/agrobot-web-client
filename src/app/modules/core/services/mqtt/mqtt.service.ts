@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { map } from 'rxjs/operators';
-import { IDevice } from '../litegraph/device.model';
+import { IDevice } from '../../models/device.model';
 
 @Injectable({
   providedIn: 'root'

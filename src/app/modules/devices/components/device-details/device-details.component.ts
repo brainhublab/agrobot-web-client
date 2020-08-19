@@ -2,9 +2,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
-import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
-import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
-import { IDevice } from '../../../shared/litegraph/device.model';
+import { ApiClientService } from 'src/app/modules/core/services/api/api-client.service';
+import { DeviceConfigurations } from 'src/app/modules/core/litegraph/config-types';
+import { IDevice } from '../../../core/models/device.model';
 import { DeviceEditorComponent } from '../device-editor/device-editor.component';
 
 @Component({

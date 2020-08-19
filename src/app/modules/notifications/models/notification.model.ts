@@ -1,4 +1,4 @@
-import { IBaseModel } from '../../shared/base.model';
+import { IBaseModel } from '../../core/models/base.model';
 
 export interface INotification extends IBaseModel {
   title: string;

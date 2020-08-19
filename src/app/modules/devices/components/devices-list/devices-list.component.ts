@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { IDevice } from '../../../shared/litegraph/device.model';
+import { IDevice } from '../../../core/models/device.model';
 import { DeviceActions } from '../../state/devices.actions';
 import { DevicesState } from '../../state/devices.state';
 

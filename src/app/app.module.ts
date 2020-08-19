@@ -15,7 +15,7 @@ import { IMqttServiceOptions, MqttModule } from 'ngx-mqtt';
 import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './components/header/header.component';
+import { HeaderComponent } from './modules/core/components/header/header.component';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SharedModule } from './modules/shared/shared.module';

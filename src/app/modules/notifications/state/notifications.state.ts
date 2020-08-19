@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Action, NgxsOnInit, Selector, State, StateContext } from '@ngxs/store';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { UIMqttService } from '../../shared/mqtt/mqtt.service';
+import { UIMqttService } from '../../core/services/mqtt/mqtt.service';
 import { INotification } from '../models/notification.model';
 import { NotificationsActions } from './notifications.actions';
 

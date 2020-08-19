@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { interval } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
-import { registerLGObservableSourceNode } from 'src/app/modules/shared/litegraph/observable-source-node';
-import { UIMqttService } from 'src/app/modules/shared/mqtt/mqtt.service';
+import { IDevice } from 'src/app/modules/core/models/device.model';
+import { registerLGObservableSourceNode } from 'src/app/modules/core/litegraph/observable-source-node';
+import { UIMqttService } from 'src/app/modules/core/services/mqtt/mqtt.service';
 
 @Injectable({
   providedIn: 'root'

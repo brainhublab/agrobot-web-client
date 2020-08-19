@@ -1,5 +1,5 @@
 import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
-import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
+import { IDevice } from 'src/app/modules/core/models/device.model';
 import { DeviceConfigurations } from './config-types';
 import { SerializedGraph } from './types';
 import { Observable } from 'rxjs';

@@ -1,6 +1,6 @@
-import { DeviceConfigurations } from './config-types';
-import { IBaseModel } from '../base.model';
-import { SerializedGraph } from './types';
+import { DeviceConfigurations } from '../litegraph/config-types';
+import { IBaseModel } from './base.model';
+import { SerializedGraph } from '../litegraph/types';
 
 /**
  * Device model

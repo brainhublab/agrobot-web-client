@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output } from '@angular/core';
 import { LiteGraph } from 'litegraph.js';
 import lodash from 'lodash';
-import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
-import { LiteGraphCanvasComponent } from 'src/app/modules/shared/canvas.component';
-import { SerializedGraph } from 'src/app/modules/shared/litegraph/types';
-import { DeviceConfigurations } from '../../../shared/litegraph/config-types';
-import { IDevice } from '../../../shared/litegraph/device.model';
-import { NodesManager } from '../../../shared/litegraph/nodes-manager';
+import { ApiClientService } from 'src/app/modules/core/services/api/api-client.service';
+import { LiteGraphCanvasComponent } from 'src/app/modules/core/components/canvas.component';
+import { SerializedGraph } from 'src/app/modules/core/litegraph/types';
+import { DeviceConfigurations } from '../../../core/litegraph/config-types';
+import { IDevice } from '../../../core/models/device.model';
+import { NodesManager } from '../../../core/litegraph/nodes-manager';
 import { MqttNodesService } from '../../services/mqtt-nodes.service';
 
 

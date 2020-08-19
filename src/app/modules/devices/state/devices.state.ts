@@ -1,9 +1,9 @@
 
 import { State, Action, StateContext, Selector, NgxsOnInit } from '@ngxs/store';
-import { IDevice } from '../../shared/litegraph/device.model';
+import { IDevice } from '../../core/models/device.model';
 import { DeviceActions } from './devices.actions';
 import { Injectable } from '@angular/core';
-import { ApiClientService } from '../../shared/api/api-client.service';
+import { ApiClientService } from '../../core/services/api/api-client.service';
 
 export class DevicesStateModel {
   loading: boolean;
