@@ -1,3 +1,6 @@
+/**
+ * Base backend model
+ */
 export interface IBaseModel {
   id: number;
   created_on?: string;

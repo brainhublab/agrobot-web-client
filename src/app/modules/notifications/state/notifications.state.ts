@@ -1,10 +1,9 @@
-
-import { State, Action, StateContext, Selector, NgxsOnInit } from '@ngxs/store';
+import { Injectable } from '@angular/core';
+import { Action, NgxsOnInit, Selector, State, StateContext } from '@ngxs/store';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { UIMqttService } from '../../shared/mqtt/mqtt.service';
 import { INotification } from '../models/notification.model';
 import { NotificationsActions } from './notifications.actions';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
-import { Injectable } from '@angular/core';
-import { UIMqttService } from '../../shared/mqtt/mqtt.service';
 
 export class NotificationsStateModel {
   notifications: INotification[];
@@ -36,17 +35,7 @@ export class NotificationsState implements NgxsOnInit {
     return state.notifications;
   }
 
-  ngxsOnInit(ctx: StateContext<NotificationsState>) {
-    this.uiMqttService.observeControllers().subscribe(c => {
-      ctx.dispatch(new NotificationsActions.Add({
-        id: Math.random() * 100,
-        title: `New device`,
-        description: `New device added: ${c.mac_addr}`,
-        type: 'info',
-        seen: false
-      }));
-    });
-  }
+  ngxsOnInit(ctx: StateContext<NotificationsState>) { }
 
   @Action(NotificationsActions.Add)
   add({ getState, patchState }: StateContext<NotificationsStateModel>, { notification }: NotificationsActions.Add) {

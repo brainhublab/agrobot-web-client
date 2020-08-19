@@ -1,35 +1,28 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { registerLocaleData } from '@angular/common';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import en from '@angular/common/locales/en';
 import { NgModule } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsModule } from '@ngxs/store';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { en_US, NZ_I18N } from 'ng-zorro-antd/i18n';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { IMqttServiceOptions, MqttModule } from 'ngx-mqtt';
+import { environment } from 'src/environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NZ_I18N } from 'ng-zorro-antd/i18n';
-import { en_US } from 'ng-zorro-antd/i18n';
-import { registerLocaleData } from '@angular/common';
-import en from '@angular/common/locales/en';
-
-registerLocaleData(en);
-
-import { NgxsModule } from '@ngxs/store';
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
-import { environment } from 'src/environments/environment';
 import { HeaderComponent } from './components/header/header.component';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { SharedModule } from './modules/shared/shared.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NotificationsModule } from './modules/notifications/notifications.module';
-
-import {
-  MqttModule,
-  IMqttServiceOptions
-} from 'ngx-mqtt';
+import { SharedModule } from './modules/shared/shared.module';
 import { TokenInterceptor } from './token.interceptor';
 
+
+registerLocaleData(en);
 
 
 export const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {

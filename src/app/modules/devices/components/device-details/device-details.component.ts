@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { first } from 'rxjs/operators';
-import { IDevice } from '../../../shared/litegraph/device.model';
 import { Subscription } from 'rxjs';
-import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
-import { DeviceEditorComponent } from '../device-editor/device-editor.component';
+import { first } from 'rxjs/operators';
 import { ApiClientService } from 'src/app/modules/shared/api/api-client.service';
+import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
+import { IDevice } from '../../../shared/litegraph/device.model';
+import { DeviceEditorComponent } from '../device-editor/device-editor.component';
 
 @Component({
   selector: 'app-device-details',
@@ -16,17 +16,26 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
   public device: IDevice;
   public loading = true;
 
-  @ViewChild('deviceEditor') deviceEditorComponent: DeviceEditorComponent;
+  @ViewChild('deviceEditor') private deviceEditorComponent: DeviceEditorComponent;
 
+  /**
+   * Device id from ActivatedRoute
+   */
   private deviceID: number;
+  /**
+   * ActivatedRoute params subscription
+   */
   private paramMapSubscription: Subscription;
 
-  public readonly deviceTemplates = [
+  public readonly deviceTypes = [
     { name: 'Water level', value: DeviceConfigurations.MCUTypes.WATER_LEVEL },
     { name: 'Nutrition control', value: DeviceConfigurations.MCUTypes.NUTRITION_CONTROL },
     { name: 'Light control', value: DeviceConfigurations.MCUTypes.LIGHT_CONTROL },
   ];
 
+  /**
+   * Are there any unsaved changes
+   */
   public get dirty() {
     return this.deviceEditorComponent?.dirty;
   }
@@ -54,7 +63,11 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
     if (this.paramMapSubscription) { this.paramMapSubscription.unsubscribe(); }
   }
 
-  public onTemplateChange(templateValue: DeviceConfigurations.MCUTypes) {
+  /**
+   * UI Configuration template selector changed it's value
+   * @param templateValue mcu type
+   */
+  public onConfigurationTemplateChange(templateValue: DeviceConfigurations.MCUTypes) {
     const conf = DeviceConfigurations.defaultDeviceConfigurationTemplates[templateValue];
     if (!conf) {
       alert('Wrong config'); // TODO
@@ -64,6 +77,9 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
     this.editDevice({ esp_config: conf });
   }
 
+  /**
+   * Removew config
+   */
   public removeConfiguration() {
     this.editDevice({ esp_config: null });
   }

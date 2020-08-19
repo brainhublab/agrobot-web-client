@@ -33,8 +33,8 @@
                 <div *ngIf="!device.esp_config?.mcuType">
                   <p>Please, select a template for esp_config:
                     <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
-                      (ngModelChange)="onTemplateChange($event)" [ngModel]="device.description">
-                      <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTemplates">
+                      (ngModelChange)="onConfigurationTemplateChange($event)" [ngModel]="device.description">
+                      <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTypes">
                       </nz-option>
                     </nz-select>
                   </p>

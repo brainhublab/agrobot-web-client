@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LineChartData } from 'projects/charts/src/lib/components/line-chart/line-chart.component';
 
 @Component({
   selector: 'app-analytics',

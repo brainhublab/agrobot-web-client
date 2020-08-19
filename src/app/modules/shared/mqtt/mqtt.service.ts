@@ -1,33 +1,33 @@
 import { Injectable } from '@angular/core';
-import { MqttService, IMqttMessage } from 'ngx-mqtt';
-import { Observable } from 'rxjs';
-import { IDevice } from '../litegraph/device.model';
+import { IMqttMessage, MqttService } from 'ngx-mqtt';
 import { map } from 'rxjs/operators';
+import { IDevice } from '../litegraph/device.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UIMqttService {
-  private controllersObservable$: Observable<IDevice> =
-    this.mqttService.observe('UI/receiveNewController').pipe(map((message: IMqttMessage) => {
-      return JSON.parse(message.payload.toString()) as IDevice;
-    }));
-
   constructor(private readonly mqttService: MqttService) { }
 
+  /**
+   * Generates observable of MessageType instances for a specific topic
+   * @param topic mqtt topic
+   */
+  private observe<MessageType>(topic: string) {
+    return this.mqttService.observe(topic).pipe(map((message: IMqttMessage) => {
+      return JSON.parse(message.payload.toString()) as MessageType;
+    }));
+  }
+
   public observeControllers() {
-    return this.controllersObservable$;
+    return this.observe<IDevice>('UI/receiveNewController');
   }
 
   public observeControllerData(mac: string) {
-    return this.mqttService.observe(`UI/ControllerData/${mac}`).pipe(map((message: IMqttMessage) => {
-      return JSON.parse(message.payload.toString()) as any;
-    }));
+    return this.observe<any>(`UI/ControllerData/${mac}`);
   }
 
   public observeControllerLogs(mac: string) {
-    return this.mqttService.observe(`UI/ControllerLogs/${mac}`).pipe(map((message: IMqttMessage) => {
-      return JSON.parse(message.payload.toString()) as any;
-    }));
+    return this.observe<any>(`UI/ControllerLogs/${mac}`);
   }
 }

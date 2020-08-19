@@ -1,12 +1,11 @@
-import { NgModule, Injectable } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Injectable, NgModule } from '@angular/core';
+import { ActivatedRouteSnapshot, CanDeactivate, RouterModule, RouterStateSnapshot, Routes, UrlTree } from '@angular/router';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { DevicesListComponent } from './components/devices-list/devices-list.component';
+import { Observable, Subject } from 'rxjs';
 import { DeviceDetailsComponent } from './components/device-details/device-details.component';
+import { DevicesListComponent } from './components/devices-list/devices-list.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 
-import { CanDeactivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 class CanDeactivateDirtyComponent implements CanDeactivate<WorkspaceComponent | DeviceDetailsComponent> {

@@ -18,15 +18,6 @@ export class NotificationsListComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  addNotification() {
-    this.store.dispatch(new NotificationsActions.Add({
-      id: Math.random() * 100,
-      title: 'new one',
-      description: 'hi, i`m new here',
-      seen: false,
-    }));
-  }
-
   seenNotification(notification: INotification) {
     if (!notification.seen) {
       this.store.dispatch(new NotificationsActions.Seen(notification.id));

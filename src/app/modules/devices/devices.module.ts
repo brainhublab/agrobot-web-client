@@ -1,32 +1,32 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { DevicesRoutingModule } from './devices-routing.module';
-import { DevicesListComponent } from './components/devices-list/devices-list.component';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NgxsModule } from '@ngxs/store';
-import { DevicesState } from './state/devices.state';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { DeviceDetailsComponent } from './components/device-details/device-details.component';
-import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
-import { WorkspaceComponent } from './components/workspace/workspace.component';
-import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NgxsModule } from '@ngxs/store';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzListModule } from 'ng-zorro-antd/list';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { ChartsModule } from 'projects/charts/src/src';
 import { SharedModule } from '../shared/shared.module';
 import { DeviceChartsComponent } from './components/device-charts/device-charts.component';
-import { ChartsModule } from 'projects/charts/src/src';
+import { DeviceDetailsComponent } from './components/device-details/device-details.component';
+import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
+import { DevicesListComponent } from './components/devices-list/devices-list.component';
+import { WorkspaceComponent } from './components/workspace/workspace.component';
+import { DevicesRoutingModule } from './devices-routing.module';
+import { DevicesState } from './state/devices.state';
+
 
 @NgModule({
   declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent, DeviceChartsComponent],

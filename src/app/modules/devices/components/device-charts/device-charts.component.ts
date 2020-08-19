@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { endOfDay, endOfHour, endOfMonth, endOfWeek, startOfDay, startOfMonth, startOfWeek, subHours, subMinutes } from 'date-fns';
 import { LineChartData } from 'projects/charts/src/lib/components/line-chart/line-chart.component';
-import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
-
+import { BehaviorSubject, interval, Subscription } from 'rxjs';
 import { DeviceConfigurations } from 'src/app/modules/shared/litegraph/config-types';
+import { IDevice } from 'src/app/modules/shared/litegraph/device.model';
 import { UIMqttService } from 'src/app/modules/shared/mqtt/mqtt.service';
-import { Subscription, interval, BehaviorSubject } from 'rxjs';
-import { endOfMonth, endOfDay, startOfDay, startOfMonth, startOfWeek, endOfWeek, subHours, endOfHour, subMinutes } from 'date-fns';
+
 
 const addZ = (n) => n < 10 ? '0' + n : '' + n;
 
@@ -41,8 +41,14 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
   private deviceDataSub: Subscription;
   @Input() readonly device: IDevice;
 
+  /**
+   * Date range for data filtering
+   */
   public dateRange: [Date, Date];
 
+  /**
+   * Static date picker templates
+   */
   public readonly datePickerRanges = {
     'Last 10 min': [subMinutes(new Date(), 10), endOfHour(new Date())],
     'Last 30 min': [subMinutes(new Date(), 30), endOfHour(new Date())],
@@ -53,6 +59,9 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
     'This Month': [startOfMonth(new Date()), endOfMonth(new Date())],
   };
 
+  /**
+   * Device data source
+   */
   public dataSubject = new BehaviorSubject<LineChartData>(INITIAL_DATA);
 
 
@@ -73,6 +82,9 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
   waterLevelFormatter = (v) => v + ' cm';
   tempFormatter = (v) => v + ' °C';
 
+  /**
+   * Subscribes to device data and propagates it to the data subject
+   */
   private observeDeviceData() {
     // this.deviceDataSub = this.uiMqttService
     //   .observeControllerData(this.device.mac_addr)
@@ -87,6 +99,10 @@ export class DeviceChartsComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Called on UI data range selector value change
+   * @param range new date range for filtering
+   */
   public onDateRangeChange(range: Date[]): void {
     if (range.length < 2) {
       this.dateRange = null;

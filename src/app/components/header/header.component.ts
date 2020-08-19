@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { NotificationsState } from 'src/app/modules/notifications/state/notifications.state';
-import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { NotificationsState } from 'src/app/modules/notifications/state/notifications.state';
 
 @Component({
   selector: 'app-header',

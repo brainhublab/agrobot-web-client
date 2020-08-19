@@ -1,9 +1,9 @@
-import { Component, OnInit, HostBinding } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Select, Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
 import { IDevice } from '../../../shared/litegraph/device.model';
-import { Store, Select } from '@ngxs/store';
 import { DeviceActions } from '../../state/devices.actions';
 import { DevicesState } from '../../state/devices.state';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-devices-list',
@@ -15,15 +15,9 @@ export class DevicesListComponent implements OnInit {
   @Select(DevicesState.getLoading) loading$: Observable<boolean>;
 
   constructor(private store: Store) { }
+
   ngOnInit(): void {
     this.reload();
-  }
-
-  addDevice() {
-    this.store.dispatch(new DeviceActions.Add({
-      id: Math.round(Math.random() * 10),
-      name: 'new one',
-    }));
   }
 
   reload() {

@@ -1,6 +1,9 @@
 import { LGraph, LGraphCanvas } from 'litegraph.js';
 import { Input, HostListener, AfterViewInit } from '@angular/core';
 
+/**
+ * Components with Litegraph.js canvas
+ */
 export abstract class LiteGraphCanvasComponent implements AfterViewInit {
   /**
    * Is Canvas dirty
