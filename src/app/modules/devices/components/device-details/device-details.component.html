@@ -46,8 +46,24 @@
                   </p>
                   <p>Tweak your esp_config:</p>
                   {{device.esp_config | json}}
-                  <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
-                  </app-device-editor>
+                  <div>
+                    <!-- <p *ngFor="let item of device.esp_config | keyvalue ">
+                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+                    </p>
+
+                    <h3>In</h3>
+                    <p *ngFor="let item of device.esp_config.in | keyvalue ">
+                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+                    </p>
+
+                    <h3>Out</h3>
+
+                    <p *ngFor="let item of device.esp_config.out | keyvalue ">
+                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+                    </p> -->
+                  </div>
+                  <!-- <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
+                  </app-device-editor> -->
                   <nz-divider></nz-divider>
                   <button nz-button nzDanger (click)="removeConfiguration()">Delete esp_config</button>
                 </div>

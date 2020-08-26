@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { LiteGraph } from 'litegraph.js';
 import { Observable, Subscription } from 'rxjs';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
@@ -7,6 +7,10 @@ import { LiteGraphCanvasComponent } from 'src/app/modules/core/components/canvas
 import { IDevice } from 'src/app/modules/core/models/device.model';
 import { NodesManager } from 'src/app/modules/core/litegraph/nodes-manager';
 import { MqttNodesService } from '../../services/mqtt-nodes.service';
+import { SerializedGraph } from 'src/app/modules/core/litegraph/types';
+import { DeviceConfigurations } from 'src/app/modules/core/litegraph/config-types';
+import { first, map } from 'rxjs/operators';
+import { ApiClientService } from 'src/app/modules/core/services/api/api-client.service';
 
 
 @Component({
@@ -17,6 +21,7 @@ import { MqttNodesService } from '../../services/mqtt-nodes.service';
 export class WorkspaceComponent extends LiteGraphCanvasComponent implements AfterViewInit, OnDestroy {
   // override
   protected canvasElementID = '#workspaceCanvas';
+  public loading = false;
 
   /**
    * Nodes manager instance
@@ -41,7 +46,9 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
   private configuredDevicesSub: Subscription;
 
   constructor(
-    private readonly mqttNodes: MqttNodesService
+    private readonly mqttNodes: MqttNodesService,
+    private readonly store: Store,
+    private readonly apiClient: ApiClientService,
   ) {
     super();
 
@@ -82,28 +89,32 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
    * TODO: implement (backend & db tables too)
    */
   public save() {
-    // const serializedGraph: SerializedGraph = this.graph.serialize();
+    const serializedGraph: SerializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
+    this.syncDevicesConfigurations(serializedGraph);
     this.dirty = false;
   }
 
-  // private async syncDevicesConfigurations(cfg: SerializedGraph): Promise<Array<{ id: number, configuration: DeviceConfiguration }>> {
-  //   const deviceConfigs: Array<{ id: number, configuration: DeviceConfiguration }> = [];
+  private async syncDevicesConfigurations(cfg: SerializedGraph) {
+    this.loading = true;
 
-  //   for (const deviceNode of cfg.nodes) {
-  //     const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
-  //     if (deviceInfo && !isNaN(deviceInfo.id)) {
-  //       const device: Device = await this.store.select(DevicesState.getByID)
-  //         .pipe(
-  //           first(),
-  //           map(ff => ff(deviceInfo.id))
-  //         ).toPromise();
-  //       const newConfig = this.nodesManager.syncDeviceConfig(device, deviceNode, cfg);
+    for (const deviceNode of cfg.nodes) {
+      const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
+      if (deviceInfo && !isNaN(deviceInfo.id)) {
+        let device: IDevice = await this.apiClient.getControllerById(deviceInfo.id).toPromise();
+        const newConfig = this.nodesManager.syncDeviceConfig(device, deviceNode, cfg);
 
-  //       deviceConfigs.push({ id: device.id, configuration: newConfig });
-  //     }
-  //   }
+        try {
+          device = await this.apiClient.updateController({
+            ...device,
+            esp_config: newConfig
+          }).toPromise();
+        } catch (e) {
+          console.warn('Error updating controller', e);
+        }
 
-  //   return deviceConfigs;
-  // }
+      }
+    }
+    this.loading = false;
+  }
 
 }

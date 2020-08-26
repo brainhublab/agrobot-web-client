@@ -81,7 +81,7 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
    * Removew config
    */
   public removeConfiguration() {
-    this.editDevice({ esp_config: null });
+    this.editDevice({ esp_config: null,  graph: null });
   }
 
   public async editDevice(pDevice: Partial<IDevice>) {

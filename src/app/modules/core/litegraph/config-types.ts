@@ -275,12 +275,14 @@ export namespace DeviceConfigurations {
     [DeviceConfigurations.MCUTypes.LIGHT_CONTROL]: {
       props: [
         { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
-      ],
-      inputs: [
-        { name: 'target_level', type: 'number', label: 'Target Leve l' },
+        { name: 'target_level', type: 'number', label: 'Target Level' },
         { name: 'latitude', type: 'number', label: 'Latitude' },
         { name: 'longitude ', type: 'number', label: 'Longitude' },
         { name: 'datetime', type: '', label: 'Curerent Time' },
+      ],
+      inputs: [
+        { name: 'target_level', type: 'number', label: 'Target Level' },
+        { name: 'datetime', type: 'string', label: 'Curerent Time' },
       ],
       outputs: [
         { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
@@ -299,6 +301,7 @@ export namespace DeviceConfigurations {
     [DeviceConfigurations.MCUTypes.NUTRITION_CONTROL]: {
       props: [
         { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
+        { name: 'concentration ', type: 'number', label: 'Concentration' },
       ],
       inputs: [
         { name: 'concentration ', type: 'number', label: 'Concentration' },
@@ -314,10 +317,13 @@ export namespace DeviceConfigurations {
       ]
     },
     [DeviceConfigurations.MCUTypes.WATER_LEVEL]: {
-      inputs: [
+      props: [
         { name: 'target_level', type: 'number', label: 'Target Level' },
         { name: 'factor', type: 'number', label: 'Factor' },
         { name: 'valve_state', type: 'boolean', label: 'Valve state' },
+      ],
+      inputs: [
+        { name: 'target_level', type: 'number', label: 'Target Level' },
       ],
       outputs: [
         { name: 'target_level', type: 'number', label: 'Target level' },

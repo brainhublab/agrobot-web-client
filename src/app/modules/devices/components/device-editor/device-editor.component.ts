@@ -125,7 +125,7 @@ export class DeviceEditorComponent extends LiteGraphCanvasComponent implements A
       this.mqttNodesService.getDeviceDataObservable(this.device)
     );
 
-    if (this.device.graph?.nodes) {
+    if (this.device.esp_config && this.device.graph?.nodes) {
       // use old graph
       this.graph.configure(this.device.graph);
     } else {

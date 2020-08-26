@@ -99,7 +99,7 @@ class NodesManager {
         this.addInput(i.name, i.type);
       });
 
-      if (!bindingMode) {
+      if (bindingMode) {
         // add props using widgets
         cfg.props?.forEach(p => {
           if (p.choises?.length > 0) {
@@ -243,17 +243,17 @@ class NodesManager {
 
   private syncDeviceInputs(deviceNode: SerializedLGraphNode, cfg: SerializedGraph, propMap: Map<string, string>) {
     const result: object = {};
-    for (const input of deviceNode.inputs) {
+    deviceNode.inputs?.forEach(input => {
       // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
       // we are the target node
       const link = cfg.links.find(l => l[0] === input.link);
-      if (!link) {
+      if (link) {
+        const sourceNode = cfg.nodes.find(n => n.id === link[1]);
+        result[propMap.get(input.name)] = sourceNode.properties.value;
+      } else {
         // empty input, let's check the next one
-        continue;
       }
-      const sourceNode = cfg.nodes.find(n => n.id === link[1]);
-      result[propMap.get(input.name)] = sourceNode.properties.value;
-    }
+    });
 
     return result;
   }
@@ -262,7 +262,8 @@ class NodesManager {
   private syncDeviceWidgetValues(deviceNode: SerializedLGraphNode, device: IDevice, propMap: Map<string, string>) {
     const result: object = {};
 
-    propMap.forEach((v, k) => {
+    // v => k, k => v
+    propMap.forEach((k, v) => {
       const widgetIdx = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.esp_config.mcuType]
         .props.findIndex(p => p.name === v);
 
@@ -289,24 +290,33 @@ class NodesManager {
     let inputPropsMap: Map<string, string>;
     let widgetPropsMap: Map<string, string>;
 
-    switch (device.esp_config.mcuType) {
+    switch (device.esp_config?.mcuType) {
       case DeviceConfigurations.MCUTypes.WATER_LEVEL:
         inputPropsMap = new Map<string, string>([
-          ['target_level', 'levelPercents'],
-          ['valve_state', 'valve'],
         ]);
 
         widgetPropsMap = new Map<string, string>([
-          ['lightMode', 'mode']
+          ['target_level', 'levelPercents'],
+          ['valve_state', 'valve'],
+          ['mode', 'lightMode']
         ]);
         break;
       case DeviceConfigurations.MCUTypes.LIGHT_CONTROL:
         inputPropsMap = new Map<string, string>([
-          ['target_level', 'targetLigstLevel']
         ]);
 
         widgetPropsMap = new Map<string, string>([
-          ['lightMode', 'mode']
+          ['target_level', 'targetLigstLevel'],
+          ['mode', 'lightMode']
+        ]);
+        break;
+      case DeviceConfigurations.MCUTypes.NUTRITION_CONTROL:
+        inputPropsMap = new Map<string, string>([
+        ]);
+
+        widgetPropsMap = new Map<string, string>([
+          ['concentration', 'targetConcentration'],
+          ['mode', 'nutritionMode']
         ]);
         break;
       default:
