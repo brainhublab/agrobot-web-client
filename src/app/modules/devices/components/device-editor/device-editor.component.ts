@@ -109,8 +109,7 @@ export class DeviceEditorComponent extends LiteGraphCanvasComponent implements A
 
     const deviceInfo = this.nodesManager.parseDeviceNodeType(deviceNode.type);
     if (deviceInfo && !isNaN(deviceInfo.id)) {
-      const newConfig = { ...this.nodesManager.syncDeviceConfig(device, deviceNode, serializedGraph) };
-      return newConfig;
+      return this.nodesManager.syncDeviceConfig(device, deviceNode, serializedGraph);
     } else {
       return null;
     }

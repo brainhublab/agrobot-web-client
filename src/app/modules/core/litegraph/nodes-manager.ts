@@ -258,6 +258,21 @@ class NodesManager {
     return result;
   }
 
+
+  private syncDeviceWidgetValues(deviceNode: SerializedLGraphNode, device: IDevice, propMap: Map<string, string>) {
+    const result: object = {};
+
+    propMap.forEach((v, k) => {
+      const widgetIdx = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.esp_config.mcuType]
+        .props.findIndex(p => p.name === v);
+
+      result[k] = deviceNode.widgets_values[widgetIdx];
+    });
+    return result;
+  }
+
+
+
   /**
    * Generates new device config based on serialized graph
    * @param device Device item
@@ -270,56 +285,48 @@ class NodesManager {
     deviceNode: SerializedLGraphNode,
     serializedGraph: SerializedGraph
   ): DeviceConfigurations.IDeviceConfiguration {
-    const oldConfig = { ...device.esp_config };
-    let newInConfig: any;
 
-    if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.WATER_LEVEL) {
-      const propsMap = new Map<string, string>([
-        ['target_level', 'levelPercents'],
-        ['valve_state', 'valve'],
+    let inputPropsMap: Map<string, string>;
+    let widgetPropsMap: Map<string, string>;
 
-      ]);
+    switch (device.esp_config.mcuType) {
+      case DeviceConfigurations.MCUTypes.WATER_LEVEL:
+        inputPropsMap = new Map<string, string>([
+          ['target_level', 'levelPercents'],
+          ['valve_state', 'valve'],
+        ]);
 
-      const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, propsMap);
+        widgetPropsMap = new Map<string, string>([
+          ['lightMode', 'mode']
+        ]);
+        break;
+      case DeviceConfigurations.MCUTypes.LIGHT_CONTROL:
+        inputPropsMap = new Map<string, string>([
+          ['target_level', 'targetLigstLevel']
+        ]);
 
-      newInConfig = {
-        ...oldConfig.in,
-        ...syncedInputs,
-      };
-    } else if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.LIGHT_CONTROL) {
-      // TODO: rename these in / out cfgs, their names are confusing in ctx of graph nodes
-      const propsMap = new Map<string, string>([
-        ['target_level', 'targetLigstLevel']
-      ]);
-      const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, propsMap);
-
-      const newLightInConfig: Partial<DeviceConfigurations.ILightControlInputs> = { ...oldConfig.in };
-      // Update Mode
-      newLightInConfig.lightMode = deviceNode.widgets_values[
-        DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[DeviceConfigurations.MCUTypes.LIGHT_CONTROL]
-          .props.findIndex(v => v.name === 'mode')
-      ];
-
-      newInConfig = {
-        ...newLightInConfig,
-        ...syncedInputs,
-      };
-    } else if (device.esp_config.mcuType === DeviceConfigurations.MCUTypes.NUTRITION_CONTROL) {
-      // TODO;
+        widgetPropsMap = new Map<string, string>([
+          ['lightMode', 'mode']
+        ]);
+        break;
+      default:
+        break;
     }
 
+    const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, inputPropsMap);
+    const syncedWidgets = this.syncDeviceWidgetValues(deviceNode, device, widgetPropsMap);
 
     const newConfig: DeviceConfigurations.IDeviceConfiguration = {
-      ...oldConfig, // preserve old
+      ...device.esp_config,
       in: {
-        ...oldConfig.in, // preserve old cfgs
-        ...newInConfig,
+        ...device.esp_config.in,
+        ...syncedInputs,
+        ...syncedWidgets
       },
       isConfigured: true
     };
 
     return newConfig;
-
   }
 
 }
