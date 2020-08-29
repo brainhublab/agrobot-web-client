@@ -1,4 +1,5 @@
 import { INodeSlot } from 'litegraph.js';
+import { IDevice } from '../models/device.model';
 
 export namespace DeviceConfigurations {
   /**
@@ -208,6 +209,7 @@ export namespace DeviceConfigurations {
      * Choices for litegraph combo widget
      */
     choises?: Array<string>;
+    value?: any;
   }
 
   export type DeviceNodeSlots = Array<IDeviceNodeSlot>;
@@ -271,74 +273,139 @@ export namespace DeviceConfigurations {
    * Device nodes descriptors
    * used by node manager to construct and parse Litegraph serialized value
    */
-  export const DEVICE_NODES_DESCRIPTORS: ILGraphDeviceNodeDescriptors = {
-    [DeviceConfigurations.MCUTypes.LIGHT_CONTROL]: {
-      props: [
-        { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
-        { name: 'target_level', type: 'number', label: 'Target Level' },
-        { name: 'latitude', type: 'number', label: 'Latitude' },
-        { name: 'longitude ', type: 'number', label: 'Longitude' },
-        { name: 'datetime', type: '', label: 'Curerent Time' },
-      ],
-      inputs: [
-        { name: 'target_level', type: 'number', label: 'Target Level' },
-        { name: 'datetime', type: 'string', label: 'Curerent Time' },
-      ],
-      outputs: [
-        { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
-        { name: 'current_level', type: 'number', label: 'Current level' },
-        { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
-        { name: 'flow_sensors_count', type: 'number' },
-      ],
-      triggers: [
-        { type: 'enable_lights', name: 'Enable Lights', handler: (action, param) => console.log('hhe', action, param) },
-        { type: 'disable_lights', name: 'Disable Lights', handler: (action, param) => console.log('hhd', action, param) },
-      ],
-      executors: [
-        { inSlots: [0], outSlot: 0, reducer: (values) => values.shift() },
-      ]
-    },
-    [DeviceConfigurations.MCUTypes.NUTRITION_CONTROL]: {
-      props: [
-        { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
-        { name: 'concentration ', type: 'number', label: 'Concentration' },
-      ],
-      inputs: [
-        { name: 'concentration ', type: 'number', label: 'Concentration' },
-      ],
-      outputs: [
-        { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
-        { name: 'current_concentration', type: 'number', label: 'Current concentration' },
-      ],
-      triggers: [
-      ],
-      executors: [
-        { inSlots: [0], outSlot: 1, reducer: (values) => values.shift() },
-      ]
-    },
-    [DeviceConfigurations.MCUTypes.WATER_LEVEL]: {
-      props: [
-        { name: 'target_level', type: 'number', label: 'Target Level' },
-        { name: 'factor', type: 'number', label: 'Factor' },
-        { name: 'valve_state', type: 'boolean', label: 'Valve state' },
-      ],
-      inputs: [
-        { name: 'target_level', type: 'number', label: 'Target Level' },
-      ],
-      outputs: [
-        { name: 'target_level', type: 'number', label: 'Target level' },
-        { name: 'current_level', type: 'number', label: 'Current level' },
-        { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
-        { name: 'flow_sensors_count', type: 'number' },
-      ],
-      triggers: [
-        { type: 'calibrate', name: 'Calibrate', handler: (action, param) => console.log('calibrate', action, param) },
-        { type: 'open_gate', name: 'Open gate', handler: (action, param) => console.log('open_gate', action, param) },
-        { type: 'close_gate', name: 'Close gate', handler: (action, param) => console.log('close gate', action, param) },
-      ],
-      executors: [
-        { inSlots: [0], outSlot: 0, reducer: (values) => values.shift() },
-      ]
+  export const getDeviceNodeDescription = (device: IDevice): ILGraphDeviceNodeDescriptor => {
+    const [inputPropsMap, widgetPropsMap] = DeviceConfigurations.getPropsMaps(device);
+
+    const getDefaultPropValue = (propName: string) => {
+      if (widgetPropsMap.has(propName)) {
+        return device.esp_config.in[widgetPropsMap.get(propName)];
+      } else {
+        return null;
+      }
+    };
+
+
+    const getDefaultInputValue = (propName: string) => {
+      if (inputPropsMap.has(propName)) {
+        return device.esp_config.in[inputPropsMap.get(propName)];
+      } else {
+        return null;
+      }
+    };
+
+
+    switch (device.esp_config.mcuType) {
+      case DeviceConfigurations.MCUTypes.LIGHT_CONTROL:
+        return {
+          props: [
+            { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'], value: getDefaultPropValue('mode') },
+            { name: 'target_level', type: 'number', label: 'Target Level', value: getDefaultPropValue('target_level') },
+            { name: 'latitude', type: 'number', label: 'Latitude', value: getDefaultPropValue('latitude') },
+            { name: 'longitude ', type: 'number', label: 'Longitude', value: getDefaultPropValue('longitude') },
+            { name: 'datetime', type: '', label: 'Curerent Time', value: getDefaultPropValue('datetime') },
+          ],
+          inputs: [
+            { name: 'target_level', type: 'number', label: 'Target Level', value: getDefaultInputValue('target_level') },
+            { name: 'datetime', type: 'string', label: 'Curerent Time', value: getDefaultInputValue('datetime') },
+          ],
+          outputs: [
+            { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'SOLAR', 'TIMER', 'CONTINUOUS'] },
+            { name: 'current_level', type: 'number', label: 'Current level' },
+            { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
+            { name: 'flow_sensors_count', type: 'number' },
+          ],
+          triggers: [
+            { type: 'enable_lights', name: 'Enable Lights', handler: (action, param) => console.log('hhe', action, param) },
+            { type: 'disable_lights', name: 'Disable Lights', handler: (action, param) => console.log('hhd', action, param) },
+          ],
+          executors: [
+            { inSlots: [0], outSlot: 0, reducer: (values) => values.shift() },
+          ]
+        }
+      case DeviceConfigurations.MCUTypes.WATER_LEVEL:
+        return {
+          props: [
+            { name: 'target_level', type: 'number', label: 'Target Level', value: getDefaultPropValue('target_level')  },
+            { name: 'factor', type: 'number', label: 'Factor', value: getDefaultPropValue('factor')  },
+            { name: 'valve_state', type: 'boolean', label: 'Valve state', value: getDefaultPropValue('valve_state')  },
+          ],
+          inputs: [
+            { name: 'target_level', type: 'number', label: 'Target Level', value: getDefaultInputValue('target_level') },
+          ],
+          outputs: [
+            { name: 'target_level', type: 'number', label: 'Target level' },
+            { name: 'current_level', type: 'number', label: 'Current level' },
+            { name: 'current_valve_state', type: 'boolean', label: 'Current valve state' },
+            { name: 'flow_sensors_count', type: 'number' },
+          ],
+          triggers: [
+            { type: 'calibrate', name: 'Calibrate', handler: (action, param) => console.log('calibrate', action, param) },
+            { type: 'open_gate', name: 'Open gate', handler: (action, param) => console.log('open_gate', action, param) },
+            { type: 'close_gate', name: 'Close gate', handler: (action, param) => console.log('close gate', action, param) },
+          ],
+          executors: [
+            { inSlots: [0], outSlot: 0, reducer: (values) => values.shift() },
+          ]
+        };
+
+      case DeviceConfigurations.MCUTypes.NUTRITION_CONTROL:
+        return {
+          props: [
+            { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'], value: getDefaultPropValue('mode')  },
+            { name: 'concentration ', type: 'number', label: 'Concentration', value: getDefaultPropValue('concentration') },
+          ],
+          inputs: [
+            { name: 'concentration ', type: 'number', label: 'Concentration', value: getDefaultPropValue('concentration') },
+          ],
+          outputs: [
+            { name: 'mode', type: 'string', label: 'Mode', choises: ['OFF', 'PERIODIC', 'RELATIVE'] },
+            { name: 'current_concentration', type: 'number', label: 'Current concentration' },
+          ],
+          triggers: [
+          ],
+          executors: [
+            { inSlots: [0], outSlot: 1, reducer: (values) => values.shift() },
+          ]
+        };
+      default:
+        break;
     }
   };
+
+  export const getPropsMaps = (device: IDevice): [Map<string, string>, Map<string, string>] => {
+    let inputPropsMap: Map<string, string>;
+    let widgetPropsMap: Map<string, string>;
+    switch (device.esp_config?.mcuType) {
+      case DeviceConfigurations.MCUTypes.WATER_LEVEL:
+        inputPropsMap = new Map<string, string>([
+        ]);
+
+        widgetPropsMap = new Map<string, string>([
+          ['target_level', 'levelPercents'],
+          ['valve_state', 'valve'],
+          ['mode', 'lightMode']
+        ]);
+        break;
+      case DeviceConfigurations.MCUTypes.LIGHT_CONTROL:
+        inputPropsMap = new Map<string, string>([
+        ]);
+
+        widgetPropsMap = new Map<string, string>([
+          ['target_level', 'targetLigstLevel'],
+          ['mode', 'lightMode']
+        ]);
+        break;
+      case DeviceConfigurations.MCUTypes.NUTRITION_CONTROL:
+        inputPropsMap = new Map<string, string>([
+        ]);
+
+        widgetPropsMap = new Map<string, string>([
+          ['concentration', 'targetConcentration'],
+          ['mode', 'nutritionMode']
+        ]);
+        break;
+    }
+
+    return [inputPropsMap, widgetPropsMap];
+  }
 }

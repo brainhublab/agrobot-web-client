@@ -88,9 +88,9 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
    * Save serialized graph
    * TODO: implement (backend & db tables too)
    */
-  public save() {
+  public async save() {
     const serializedGraph: SerializedGraph = JSON.parse(JSON.stringify(this.graph.serialize()));
-    this.syncDevicesConfigurations(serializedGraph);
+    await this.syncDevicesConfigurations(serializedGraph);
     this.dirty = false;
   }
 

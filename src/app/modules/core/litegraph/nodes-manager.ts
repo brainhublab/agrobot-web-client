@@ -50,7 +50,7 @@ class NodesManager {
   }
 
   private getNodeConfig(device: IDevice): INodeConfig {
-    const deviceNodeDescriptor = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.esp_config?.mcuType];
+    const deviceNodeDescriptor = DeviceConfigurations.getDeviceNodeDescription(device);
     return {
       type: this.getDeviceNodeType(device),
       title: `${device.name} (${device.esp_config.mcuType}, ${device.id})`,
@@ -103,10 +103,10 @@ class NodesManager {
         // add props using widgets
         cfg.props?.forEach(p => {
           if (p.choises?.length > 0) {
-            this.addWidget('combo', p.label, p.choises[0], (v) => null, { values: p.choises });
+            this.addWidget('combo', p.label, p.value, (v) => null, { values: p.choises });
           } else if (p.type === 'number') {
             // TODO: min, max, default
-            this.addWidget('number', p.label, 0.5, (v) => null, { min: 0, max: 100 });
+            this.addWidget('number', p.label, p.value, (v) => null, { min: 0, max: 100 });
           } else {
             console.warn('Unhandled prop: ', p);
           }
@@ -126,7 +126,7 @@ class NodesManager {
         this.addInput(t.name, LiteGraph.ACTION);
         if (!bindingMode) {
           // widget trigger
-          this.button = this.addWidget('button', t.name, 'Button', t.handler, {});
+          this.button = this.addWidget('button', t.name, 0, t.handler, {});
         }
       });
     }
@@ -264,7 +264,7 @@ class NodesManager {
 
     // v => k, k => v
     propMap.forEach((k, v) => {
-      const widgetIdx = DeviceConfigurations.DEVICE_NODES_DESCRIPTORS[device.esp_config.mcuType]
+      const widgetIdx = DeviceConfigurations.getDeviceNodeDescription(device)
         .props.findIndex(p => p.name === v);
 
       result[k] = deviceNode.widgets_values[widgetIdx];
@@ -287,41 +287,7 @@ class NodesManager {
     serializedGraph: SerializedGraph
   ): DeviceConfigurations.IDeviceConfiguration {
 
-    let inputPropsMap: Map<string, string>;
-    let widgetPropsMap: Map<string, string>;
-
-    switch (device.esp_config?.mcuType) {
-      case DeviceConfigurations.MCUTypes.WATER_LEVEL:
-        inputPropsMap = new Map<string, string>([
-        ]);
-
-        widgetPropsMap = new Map<string, string>([
-          ['target_level', 'levelPercents'],
-          ['valve_state', 'valve'],
-          ['mode', 'lightMode']
-        ]);
-        break;
-      case DeviceConfigurations.MCUTypes.LIGHT_CONTROL:
-        inputPropsMap = new Map<string, string>([
-        ]);
-
-        widgetPropsMap = new Map<string, string>([
-          ['target_level', 'targetLigstLevel'],
-          ['mode', 'lightMode']
-        ]);
-        break;
-      case DeviceConfigurations.MCUTypes.NUTRITION_CONTROL:
-        inputPropsMap = new Map<string, string>([
-        ]);
-
-        widgetPropsMap = new Map<string, string>([
-          ['concentration', 'targetConcentration'],
-          ['mode', 'nutritionMode']
-        ]);
-        break;
-      default:
-        break;
-    }
+    const [inputPropsMap, widgetPropsMap] = DeviceConfigurations.getPropsMaps(device);
 
     const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, inputPropsMap);
     const syncedWidgets = this.syncDeviceWidgetValues(deviceNode, device, widgetPropsMap);
