@@ -62,5 +62,4 @@ export const registerLGObservableSourceNode = (dataObservable: Observable<string
   };
 
   LiteGraph.registerNodeType('source/observable', LGObservableSourceNode as any);
-
-}
+};

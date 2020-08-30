@@ -75,6 +75,7 @@ export abstract class LiteGraphCanvasComponent implements AfterViewInit {
 
     // toggle flag
     this.started = !this.started;
+    this.setReadOnly(this.started);
   }
 
 
@@ -102,6 +103,14 @@ export abstract class LiteGraphCanvasComponent implements AfterViewInit {
    */
   protected onCanvasMouseDownSideEffect() {
     this.dirty = true;
+  }
+
+  /**
+   * Set's canvas read-only mode
+   * @param value is readonly
+   */
+  protected setReadOnly(value: boolean) {
+    (this.canvas as any).read_only = value;
   }
 
 }

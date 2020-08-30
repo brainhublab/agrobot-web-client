@@ -26,6 +26,7 @@ import { DevicesListComponent } from './components/devices-list/devices-list.com
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { DevicesRoutingModule } from './devices-routing.module';
 import { DevicesState } from './state/devices.state';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 
 @NgModule({
@@ -51,6 +52,7 @@ import { DevicesState } from './state/devices.state';
     NzDatePickerModule,
     SharedModule,
     ChartsModule,
+    NzMessageModule,
     NgxsModule.forFeature(
       [DevicesState]
     )
