@@ -1,8 +1,9 @@
-import { LiteGraph, LGraph, LGraphNode, SerializedLGraphNode } from 'litegraph.js';
+import { LGraph, LGraphNode, LiteGraph, SerializedLGraphNode } from 'litegraph.js';
+import { Observable } from 'rxjs';
 import { IDevice } from 'src/app/modules/core/models/device.model';
 import { DeviceConfigurations } from './config-types';
+import { EditableDataPlotWidget } from './editable-dataplot.widget';
 import { SerializedGraph } from './types';
-import { Observable } from 'rxjs';
 
 type INodeData = string;
 
@@ -111,6 +112,7 @@ class NodesManager {
             console.warn('Unhandled prop: ', p);
           }
         });
+        this.addCustomWidget(new EditableDataPlotWidget('Dataplot Name', { max: 10, min: 0 }, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
       }
 
       if (bindingMode) {
