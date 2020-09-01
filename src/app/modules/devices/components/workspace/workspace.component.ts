@@ -1,8 +1,10 @@
+import { CdkDragEnd } from '@angular/cdk/drag-drop';
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { Select } from '@ngxs/store';
-import { LiteGraph } from 'litegraph.js';
+import { LiteGraph, Vector2 } from 'litegraph.js';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Observable, Subscription } from 'rxjs';
+import { delay, filter } from 'rxjs/operators';
 import { LiteGraphCanvasComponent } from 'src/app/modules/core/components/canvas.component';
 import { NodesManager } from 'src/app/modules/core/litegraph/nodes-manager';
 import { SerializedGraph } from 'src/app/modules/core/litegraph/types';
@@ -10,8 +12,6 @@ import { IDevice } from 'src/app/modules/core/models/device.model';
 import { ApiClientService } from 'src/app/modules/core/services/api/api-client.service';
 import { DevicesState } from 'src/app/modules/devices/state/devices.state';
 import { MqttNodesService } from '../../services/mqtt-nodes.service';
-import { filter, delay } from 'rxjs/operators';
-
 
 @Component({
   selector: 'app-workspace',
@@ -20,7 +20,7 @@ import { filter, delay } from 'rxjs/operators';
 })
 export class WorkspaceComponent extends LiteGraphCanvasComponent implements AfterViewInit, OnDestroy {
   // override
-  protected canvasElementID = '#workspaceCanvas';
+  protected canvasElementID = 'workspaceCanvas';
   /**
    * Loading status
    */
@@ -29,7 +29,7 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
   /**
    * Nodes manager instance
    */
-  private nodesManager = new NodesManager(
+  public nodesManager = new NodesManager(
     [
       'basic/const',
       'basic/boolean',
@@ -90,10 +90,10 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
     this.configuredDevicesSub = this.configuredDevices$.pipe(filter(i => i !== null)).subscribe((devices: Array<IDevice>) => {
       for (const device of devices) {
         const cfg = this.nodesManager.registerWsDeviceNode(device, this.mqttNodes.getDeviceDataObservable(device));
-        const deviceNode = LiteGraph.createNode(cfg.type);
-        deviceNode.pos = [lastOffset, 200];
-        lastOffset += deviceNode.computeSize()[0] + 50;
-        this.graph.add(deviceNode);
+        // const deviceNode = LiteGraph.createNode(cfg.type);
+        // deviceNode.pos = [lastOffset, 200];
+        // lastOffset += deviceNode.computeSize()[0] + 50;
+        // this.graph.add(deviceNode);
       }
 
       this.nzMsg.remove(msgID);
@@ -137,4 +137,27 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
     }
   }
 
+  public droppedItemOnCanvas(event) {
+    console.log('dropped canvas: ', event);
+  }
+
+  public onItemDropped($event: CdkDragEnd) {
+    const bb = $event.source.element.nativeElement.getBoundingClientRect();
+    const pos: Vector2 = [bb.x + $event.distance.x, bb.y + $event.distance.y];
+    const el = document.elementFromPoint(pos[0], pos[1]);
+    if (el.id === this.canvasElementID) {
+      const device = $event.source.data as IDevice;
+      // const cfg = this.nodesManager.registerWsDeviceNode(device, this.mqttNodes.getDeviceDataObservable(device));
+      const deviceNode = LiteGraph.createNode(this.nodesManager.getDeviceNodeType(device));
+      deviceNode.pos = pos;
+      // 0 += deviceNode.computeSize()[0] + 50;
+      this.graph.add(deviceNode);
+    } else {
+      console.log(el);
+    }
+  }
+
+  public getDeviceNodeType(device: IDevice) {
+    return this.nodesManager.getDeviceNodeType(device);
+  }
 }

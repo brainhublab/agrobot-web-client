@@ -27,12 +27,14 @@ import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { DevicesRoutingModule } from './devices-routing.module';
 import { DevicesState } from './state/devices.state';
 import { NzMessageModule } from 'ng-zorro-antd/message';
-
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
   declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent, DeviceChartsComponent],
   imports: [
     CommonModule,
+    DragDropModule,
     FormsModule,
     DevicesRoutingModule,
     NzListModule,
@@ -52,6 +54,7 @@ import { NzMessageModule } from 'ng-zorro-antd/message';
     NzDatePickerModule,
     SharedModule,
     ChartsModule,
+    NzDrawerModule,
     NzMessageModule,
     NgxsModule.forFeature(
       [DevicesState]

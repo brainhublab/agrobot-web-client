@@ -1,8 +1,38 @@
-<canvas id='workspaceCanvas' [width]='width' [height]='height'></canvas>
-<div class="buttons">
-  <button (click)="toggleLiteGraphLiveMode()" nz-button>{{started ? 'Stop' : 'Start'}}</button>
-  <button (click)="save()" *ngIf="dirty" [nzLoading]="loading" nz-button>Save</button>
-  <button nz-button>
-    <a routerLink="/devices">Back to list view</a>
-  </button>
+<div cdkDropList>
+  <canvas id='workspaceCanvas' [width]='width' [height]='height'></canvas>
+  <div class="buttons">
+    <button (click)="toggleLiteGraphLiveMode()" nz-button>{{started ? 'Stop' : 'Start'}}</button>
+    <button (click)="save()" *ngIf="dirty" [nzLoading]="loading" nz-button>Save</button>
+    <button nz-button>
+      <a routerLink="/devices">Back to list view</a>
+    </button>
+  </div>
+  <div class="side-panel">
+    <h3 nz-typography>Nodes</h3>
+    <nz-tabset>
+      <nz-tab nzTitle="Controllers">
+        <div nz-row class="controller-list" [nzGutter]="0">
+          <div *ngFor="let device of configuredDevices$ | async" class="controller" nz-col [nzXXl]="12" [nzXl]="24">
+            <div class="draggable" cdkDrag [cdkDragData]="device"
+              [cdkDragDisabled]="nodesManager.multitonNodes.has(getDeviceNodeType(device))"
+              (cdkDragEnded)="onItemDropped($event)">
+              <div class="card">
+                <h4 class="title">{{device.name}}</h4>
+                <ul>
+                  <li>{{device.mac_addr}}</li>
+                  <li *ngIf="device.esp_config?.mcuType">{{device.esp_config.mcuType}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nz-tab>
+      <nz-tab nzTitle="Nodes">
+        Some nodes...
+      </nz-tab>
+      <nz-tab nzTitle="Actions">
+        Some actions...
+      </nz-tab>
+    </nz-tabset>
+  </div>
 </div>

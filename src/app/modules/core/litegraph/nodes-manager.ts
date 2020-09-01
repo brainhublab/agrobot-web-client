@@ -24,7 +24,7 @@ const sourceNodeTypes = {
 
 
 class NodesManager {
-  private readonly multitonNodes: Map<string, LGraphNode> = new Map<string, LGraphNode>();
+  public readonly multitonNodes: Map<string, LGraphNode> = new Map<string, LGraphNode>();
 
   constructor(
     private allowedNodeTypes = [

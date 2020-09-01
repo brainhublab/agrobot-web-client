@@ -91,7 +91,7 @@ export abstract class LiteGraphCanvasComponent implements AfterViewInit {
     this.recalculateCanvasSize();
     this.graph = new LGraph();
 
-    this.canvas = new LGraphCanvas(this.canvasElementID, this.graph);
+    this.canvas = new LGraphCanvas('#' + this.canvasElementID, this.graph);
     this.canvas.canvas.addEventListener('mousedown', () => {
       // handle changes
       this.onCanvasMouseDownSideEffect();

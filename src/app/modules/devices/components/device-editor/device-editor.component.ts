@@ -17,7 +17,7 @@ import { MqttNodesService } from '../../services/mqtt-nodes.service';
 })
 export class DeviceEditorComponent extends LiteGraphCanvasComponent implements AfterViewInit {
   // override
-  protected canvasElementID = '#deviceCanvas';
+  protected canvasElementID = 'deviceCanvas';
 
   /**
    * Device instance
