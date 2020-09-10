@@ -19,6 +19,8 @@ import { MqttNodesService } from '../../services/mqtt-nodes.service';
   styleUrls: ['./workspace.component.scss']
 })
 export class WorkspaceComponent extends LiteGraphCanvasComponent implements AfterViewInit, OnDestroy {
+  editingDevice: IDevice = null;
+
   // override
   protected canvasElementID = 'workspaceCanvas';
   /**
@@ -48,6 +50,7 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
    */
   private configuredDevicesSub: Subscription;
 
+  public nodes: Array<string> = [];
   constructor(
     private readonly mqttNodes: MqttNodesService,
     private readonly nzMsg: NzMessageService,
@@ -57,6 +60,7 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
 
     this.nodesManager.deleteNotAllowedNodes();
     this.mqttNodes.registerCustomNodes();
+    this.nodes = Object.keys(LiteGraph.registered_node_types).sort((a, b) => a.localeCompare(b));
   }
 
   ngOnDestroy(): void {
@@ -141,7 +145,7 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
     console.log('dropped canvas: ', event);
   }
 
-  public onItemDropped($event: CdkDragEnd) {
+  public onControllerDropped($event: CdkDragEnd) {
     const bb = $event.source.element.nativeElement.getBoundingClientRect();
     const pos: Vector2 = [bb.x + $event.distance.x, bb.y + $event.distance.y];
     const el = document.elementFromPoint(pos[0], pos[1]);
@@ -149,7 +153,7 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
       const device = $event.source.data as IDevice;
       // const cfg = this.nodesManager.registerWsDeviceNode(device, this.mqttNodes.getDeviceDataObservable(device));
       const deviceNode = LiteGraph.createNode(this.nodesManager.getDeviceNodeType(device));
-      deviceNode.pos = pos;
+      deviceNode.pos = this.canvas.convertCanvasToOffset(pos);
       // 0 += deviceNode.computeSize()[0] + 50;
       this.graph.add(deviceNode);
     } else {
@@ -157,7 +161,26 @@ export class WorkspaceComponent extends LiteGraphCanvasComponent implements Afte
     }
   }
 
+  public onNodeDropped($event: CdkDragEnd) {
+    const bb = $event.source.element.nativeElement.getBoundingClientRect();
+    const pos: Vector2 = [bb.x + $event.distance.x, bb.y + $event.distance.y];
+    const el = document.elementFromPoint(pos[0], pos[1]);
+    if (el.id === this.canvasElementID) {
+      const nodeType = $event.source.data as string;
+
+      const newNode = LiteGraph.createNode(nodeType);
+      newNode.pos = this.canvas.convertCanvasToOffset(pos);
+      this.graph.add(newNode);
+    } else {
+      console.log(el);
+    }
+  }
+
   public getDeviceNodeType(device: IDevice) {
     return this.nodesManager.getDeviceNodeType(device);
+  }
+
+  public editDevice(device: IDevice) {
+    this.editingDevice = device;
   }
 }

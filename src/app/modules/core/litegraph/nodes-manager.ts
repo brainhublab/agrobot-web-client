@@ -1,4 +1,4 @@
-import { LGraph, LGraphNode, LiteGraph, SerializedLGraphNode } from 'litegraph.js';
+import { LGraph, LGraphNode, LiteGraph, SerializedLGraphNode, LGraphCanvas, ContextMenuItem, ContextMenuEventListener } from 'litegraph.js';
 import { Observable } from 'rxjs';
 import { IDevice } from 'src/app/modules/core/models/device.model';
 import { DeviceConfigurations } from './config-types';
@@ -54,14 +54,14 @@ class NodesManager {
     const deviceNodeDescriptor = DeviceConfigurations.getDeviceNodeDescription(device);
     return {
       type: this.getDeviceNodeType(device),
-      title: `${device.name} (${device.esp_config.mcuType}, ${device.id})`,
+      title: `${device.name} (${device.mcuType}, ${device.id})`,
       mac: device.mac_addr,
       ...deviceNodeDescriptor,
     };
   }
 
   public getDeviceNodeType = (device: IDevice): string => {
-    return `${device.esp_config.mcuType}/${device.id}`;
+    return `${device.mcuType}/${device.id}`;
   }
 
 
@@ -108,11 +108,13 @@ class NodesManager {
           } else if (p.type === 'number') {
             // TODO: min, max, default
             this.addWidget('number', p.label, p.value, (v) => null, { min: 0, max: 100 });
+          } else if (p.type === 'boolean') {
+            this.addWidget('toggle', p.label, p.value, (v) => null, { on: 'Enabled', off: 'Disabled' });
           } else {
             console.warn('Unhandled prop: ', p);
           }
         });
-        this.addCustomWidget(new EditableDataPlotWidget('Dataplot Name', { max: 10, min: 0 }, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+        this.addCustomWidget(new EditableDataPlotWidget('Dataplot Name', { max: 23, min: 0 }, [...Array(23).keys()]));
       }
 
       if (bindingMode) {
@@ -126,10 +128,8 @@ class NodesManager {
       cfg.triggers.forEach(t => {
         // input trigger , handled by onAction function
         this.addInput(t.name, LiteGraph.ACTION);
-        if (!bindingMode) {
-          // widget trigger
-          this.button = this.addWidget('button', t.name, 0, t.handler, {});
-        }
+        // widget trigger
+        this.button = this.addWidget('button', t.name, 0, t.handler, {});
       });
     }
 
@@ -154,6 +154,23 @@ class NodesManager {
       }
     };
 
+
+    NodeConstructor.prototype.resizeGuard = function(): null | ContextMenuEventListener {
+      return this.resizable ? LGraphCanvas.onResizeNode : null;
+    }
+
+    NodeConstructor.prototype.getMenuOptions = function (graphCanvas: LGraphCanvas): ContextMenuItem[] {
+      return [
+        {
+          content: "Resize", callback: this.resizeGuard()
+        },
+        {
+          content: "Collapse",
+          callback: LGraphCanvas.onMenuNodeCollapse
+        },
+        null
+      ];
+    }
     // setup execution
     NodeConstructor.prototype.onExecute = function () {
       // process data subscription
@@ -243,7 +260,7 @@ class NodesManager {
     });
   }
 
-  private syncDeviceInputs(deviceNode: SerializedLGraphNode, cfg: SerializedGraph, propMap: Map<string, string>) {
+  private syncDeviceInputs(deviceNode: SerializedLGraphNode, cfg: SerializedGraph) {
     const result: object = {};
     deviceNode.inputs?.forEach(input => {
       // [link.id, link.origin_id, link.origin_slot, link.target_id, link.target_slot, link.type]
@@ -251,7 +268,7 @@ class NodesManager {
       const link = cfg.links.find(l => l[0] === input.link);
       if (link) {
         const sourceNode = cfg.nodes.find(n => n.id === link[1]);
-        result[propMap.get(input.name)] = sourceNode.properties.value;
+        result[input.name] = sourceNode.properties.value;
       } else {
         // empty input, let's check the next one
       }
@@ -261,15 +278,12 @@ class NodesManager {
   }
 
 
-  private syncDeviceWidgetValues(deviceNode: SerializedLGraphNode, device: IDevice, propMap: Map<string, string>) {
+  private syncDeviceWidgetValues(deviceNode: SerializedLGraphNode, device: IDevice) {
     const result: object = {};
 
     // v => k, k => v
-    propMap.forEach((k, v) => {
-      const widgetIdx = DeviceConfigurations.getDeviceNodeDescription(device)
-        .props.findIndex(p => p.name === v);
-
-      result[k] = deviceNode.widgets_values[widgetIdx];
+    DeviceConfigurations.getDeviceNodeDescription(device).props.forEach((p, widgetIdx) => {
+      result[p.name] = deviceNode.widgets_values[widgetIdx];
     });
     return result;
   }
@@ -289,10 +303,8 @@ class NodesManager {
     serializedGraph: SerializedGraph
   ): DeviceConfigurations.IDeviceConfiguration {
 
-    const [inputPropsMap, widgetPropsMap] = DeviceConfigurations.getPropsMaps(device);
-
-    const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph, inputPropsMap);
-    const syncedWidgets = this.syncDeviceWidgetValues(deviceNode, device, widgetPropsMap);
+    const syncedInputs = this.syncDeviceInputs(deviceNode, serializedGraph);
+    const syncedWidgets = this.syncDeviceWidgetValues(deviceNode, device);
 
     const newConfig: DeviceConfigurations.IDeviceConfiguration = {
       ...device.esp_config,
@@ -301,7 +313,6 @@ class NodesManager {
         ...syncedInputs,
         ...syncedWidgets
       },
-      isConfigured: true
     };
 
     return newConfig;

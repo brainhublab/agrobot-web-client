@@ -1,4 +1,4 @@
-<div cdkDropList>
+<div cdkDropList [ngStyle]="{'max-height': viewHeight + 'px'}">
   <canvas id='workspaceCanvas' [width]='width' [height]='height'></canvas>
   <div class="buttons">
     <button (click)="toggleLiteGraphLiveMode()" nz-button>{{started ? 'Stop' : 'Start'}}</button>
@@ -11,24 +11,42 @@
     <h3 nz-typography>Nodes</h3>
     <nz-tabset>
       <nz-tab nzTitle="Controllers">
-        <div nz-row class="controller-list" [nzGutter]="0">
-          <div *ngFor="let device of configuredDevices$ | async" class="controller" nz-col [nzXXl]="12" [nzXl]="24">
+        <!-- <div nz-row class="controller-list" [nzGutter]="0"> -->
+        <!-- <div *ngFor="let device of configuredDevices$ | async" class="controller" nz-col [nzXXl]="12" [nzXl]="24">
             <div class="draggable" cdkDrag [cdkDragData]="device"
               [cdkDragDisabled]="nodesManager.multitonNodes.has(getDeviceNodeType(device))"
-              (cdkDragEnded)="onItemDropped($event)">
+              (cdkDragEnded)="onControllerDropped($event)">
               <div class="card">
                 <h4 class="title">{{device.name}}</h4>
                 <ul>
                   <li>{{device.mac_addr}}</li>
-                  <li *ngIf="device.esp_config?.mcuType">{{device.esp_config.mcuType}}</li>
+                  <li *ngIf="device.mcuType">{{device.mcuType}}</li>
                 </ul>
               </div>
             </div>
+          </div> -->
+        <!-- </div> -->
+        <div class="nodes-list">
+          <div *ngFor="let device of configuredDevices$ | async" class="draggable" cdkDrag [cdkDragData]="device"
+            [cdkDragDisabled]="nodesManager.multitonNodes.has(getDeviceNodeType(device))"
+            (cdkDragEnded)="onControllerDropped($event)" (dblclick)="editDevice(device)">
+            <button nz-button class="node" nzSize="large">
+              <i nz-icon nzType="control"></i>
+              {{device.name}}
+              <nz-tag class="tag">{{device.mac_addr}}</nz-tag>
+            </button>
           </div>
         </div>
+
+
       </nz-tab>
       <nz-tab nzTitle="Nodes">
-        Some nodes...
+        <div class="nodes-list">
+          <div *ngFor="let node of nodes" class="draggable" cdkDrag [cdkDragData]="node"
+            (cdkDragEnded)="onNodeDropped($event)">
+            <button nz-button nzSize="large" class="node"><i nz-icon nzType="subnode"></i>{{node}}</button>
+          </div>
+        </div>
       </nz-tab>
       <nz-tab nzTitle="Actions">
         Some actions...
@@ -36,3 +54,7 @@
     </nz-tabset>
   </div>
 </div>
+
+<nz-modal [nzVisible]="editingDevice" [nzTitle]="editingDevice?.name" [nzFooter]="null" (nzOnCancel)="editingDevice = null" [nzWidth]="'50%'">
+  <app-device-details [device]="editingDevice" [compact]="true"></app-device-details>
+</nz-modal>

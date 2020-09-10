@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, Input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { first } from 'rxjs/operators';
 import { ApiClientService } from 'src/app/modules/core/services/api/api-client.service';
 import { DeviceConfigurations } from 'src/app/modules/core/litegraph/config-types';
 import { IDevice } from '../../../core/models/device.model';
-import { DeviceEditorComponent } from '../device-editor/device-editor.component';
+import { DeviceActions } from '../../state/devices.actions';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-device-details',
@@ -13,10 +14,9 @@ import { DeviceEditorComponent } from '../device-editor/device-editor.component'
   styleUrls: ['./device-details.component.scss']
 })
 export class DeviceDetailsComponent implements OnInit, OnDestroy {
-  public device: IDevice;
+  @Input() public device: IDevice;
   public loading = true;
-
-  @ViewChild('deviceEditor') private deviceEditorComponent: DeviceEditorComponent;
+  @Input() compact = false;
 
   /**
    * Device id from ActivatedRoute
@@ -37,12 +37,13 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
    * Are there any unsaved changes
    */
   public get dirty() {
-    return this.deviceEditorComponent?.dirty;
+    return false;
   }
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly apiClient: ApiClientService
+    private readonly apiClient: ApiClientService,
+    private readonly store: Store
   ) { }
 
   ngOnInit(): void {
@@ -55,6 +56,8 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
             this.device = d;
             this.loading = false;
           });
+      } else {
+        this.loading = false;
       }
     });
   }
@@ -74,14 +77,18 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.editDevice({ esp_config: conf });
+    this.editDevice({
+      isConfigured: true,
+      mcuType: templateValue,
+      esp_config: conf
+    });
   }
 
   /**
    * Removew config
    */
   public removeConfiguration() {
-    this.editDevice({ esp_config: null,  graph: null });
+    this.editDevice({ esp_config: null });
   }
 
   public async editDevice(pDevice: Partial<IDevice>) {
@@ -89,5 +96,7 @@ export class DeviceDetailsComponent implements OnInit, OnDestroy {
       ...this.device,
       ...pDevice
     }).toPromise();
+
+    this.store.dispatch(new DeviceActions.Reload());
   }
 }

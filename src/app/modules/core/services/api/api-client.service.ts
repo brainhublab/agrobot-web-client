@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { first, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { IDevice } from '../../models/device.model';
+import { DeviceConfigurations } from '../../litegraph/config-types';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,16 @@ export class ApiClientService {
    * Load controllers
    */
   getControllers() {
-    return this.get<Array<IDevice>>(`controllers`);
+    return this.get<Array<IDevice>>(`controllers`).pipe(map(v => {
+      return v.map(d => {
+        return {
+          ...d,
+          isConfigured: true,
+          mcuType: DeviceConfigurations.MCUTypes.WATER_LEVEL,
+          esp_config: DeviceConfigurations.defaultDeviceConfigurationTemplates[DeviceConfigurations.MCUTypes.WATER_LEVEL]
+        };
+      });
+    }));
   }
 
   /**

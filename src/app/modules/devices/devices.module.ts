@@ -21,7 +21,6 @@ import { ChartsModule } from 'projects/charts/src/src';
 import { SharedModule } from '../shared/shared.module';
 import { DeviceChartsComponent } from './components/device-charts/device-charts.component';
 import { DeviceDetailsComponent } from './components/device-details/device-details.component';
-import { DeviceEditorComponent } from './components/device-editor/device-editor.component';
 import { DevicesListComponent } from './components/devices-list/devices-list.component';
 import { WorkspaceComponent } from './components/workspace/workspace.component';
 import { DevicesRoutingModule } from './devices-routing.module';
@@ -31,7 +30,7 @@ import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
-  declarations: [DevicesListComponent, DeviceDetailsComponent, DeviceEditorComponent, WorkspaceComponent, DeviceChartsComponent],
+  declarations: [DevicesListComponent, DeviceDetailsComponent, WorkspaceComponent, DeviceChartsComponent],
   imports: [
     CommonModule,
     DragDropModule,

@@ -39,7 +39,7 @@ export class DevicesState implements NgxsOnInit {
 
   @Selector()
   static getConfiguredDevices(state: DevicesStateModel) {
-    return state.devices.filter(v => v?.esp_config?.isConfigured);
+    return state.devices.filter(d => d?.isConfigured);
   }
 
   @Selector()

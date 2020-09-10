@@ -2,85 +2,95 @@
 
   <nz-spin [nzSpinning]="loading" nzTip="Loading device..." [class.mt]="loading">
     <app-page-not-found *ngIf="!loading && !device"></app-page-not-found>
-    <nz-page-header nzBackIcon *ngIf="!loading && device">
+
+
+    <ng-container *ngIf="compact" [ngTemplateOutlet]="contentTpl" [ngTemplateOutletContext]="{ $implicit: device }">
+    </ng-container>
+
+    <nz-page-header nzBackIcon *ngIf="!compact && !loading && device">
       <nz-page-header-title>{{device?.name}}</nz-page-header-title>
       <nz-page-header-subtitle>Device</nz-page-header-subtitle>
       <nz-page-header-extra>
-        <nz-tag *ngIf="device.esp_config?.isConfigured" nzColor="#52c41a">configured</nz-tag>
-        <nz-tag *ngIf="!device.esp_config?.isConfigured" nzColor="#faad14">not configured</nz-tag>
+        <nz-tag *ngIf="device.isConfigured" nzColor="#52c41a">configured</nz-tag>
+        <nz-tag *ngIf="!device.isConfigured" nzColor="#faad14">not configured</nz-tag>
       </nz-page-header-extra>
       <nz-page-header-content>
-        <div class="content">
-
-          <div><b>Name:</b>
-            <p nz-typography nzEditable [nzContent]="device?.name || 'Blank'"
-              (nzContentChange)="editDevice({name: $event})">
-            </p>
-          </div>
-
-          <div><b>MAC:</b>
-            <p nz-typography nzCopyable [nzContent]="device?.mac_addr"></p>
-          </div>
-
-          <div><b>Description:</b>
-            <p nz-typography nzEditable [nzContent]="device?.description"
-              (nzContentChange)="editDevice({description: $event})"></p>
-          </div>
-          <nz-tabset>
-            <nz-tab nzTitle="Configuration">
-              <ng-template nz-tab>
-                <!-- <nz-divider nzText="Configuration"></nz-divider> -->
-                <div *ngIf="!device.esp_config?.mcuType">
-                  <p>Please, select a template for esp_config:
-                    <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
-                      (ngModelChange)="onConfigurationTemplateChange($event)" [ngModel]="device.description">
-                      <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTypes">
-                      </nz-option>
-                    </nz-select>
-                  </p>
-                </div>
-                <div *ngIf="device.esp_config?.mcuType">
-                  <p>This device is using
-                    <nz-tag nzColor="#52b01a">{{device.esp_config.mcuType}}</nz-tag>
-                    template.
-                  </p>
-                  <p>Tweak your esp_config:</p>
-                  {{device.esp_config | json}}
-                  <div>
-                    <!-- <p *ngFor="let item of device.esp_config | keyvalue ">
-                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
-                    </p>
-
-                    <h3>In</h3>
-                    <p *ngFor="let item of device.esp_config.in | keyvalue ">
-                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
-                    </p>
-
-                    <h3>Out</h3>
-
-                    <p *ngFor="let item of device.esp_config.out | keyvalue ">
-                      <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
-                    </p> -->
-                  </div>
-                  <!-- <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
-                  </app-device-editor> -->
-                  <nz-divider></nz-divider>
-                  <button nz-button nzDanger (click)="removeConfiguration()">Delete esp_config</button>
-                </div>
-              </ng-template>
-            </nz-tab>
-            <nz-tab nzTitle="Charts">
-              <ng-template nz-tab>
-                <app-device-charts [device]="device"></app-device-charts>
-              </ng-template>
-            </nz-tab>
-          </nz-tabset>
-
-
-
-        </div>
+        <ng-container [ngTemplateOutlet]="contentTpl" [ngTemplateOutletContext]="{ $implicit: device }">
+        </ng-container>
       </nz-page-header-content>
     </nz-page-header>
   </nz-spin>
 
 </div>
+
+
+<ng-template #contentTpl let-device>
+  <div class="content" *ngIf="device">
+
+    <div><b>Name:</b>
+      <p nz-typography nzEditable [nzContent]="device?.name || 'Blank'" (nzContentChange)="editDevice({name: $event})">
+      </p>
+    </div>
+
+    <div><b>MAC:</b>
+      <p nz-typography nzCopyable [nzContent]="device?.mac_addr"></p>
+    </div>
+
+    <div><b>Description:</b>
+      <p nz-typography nzEditable [nzContent]="device?.description"
+        (nzContentChange)="editDevice({description: $event})"></p>
+    </div>
+    <nz-tabset>
+      <nz-tab nzTitle="Configuration">
+        <ng-template nz-tab>
+          <!-- <nz-divider nzText="Configuration"></nz-divider> -->
+          <div *ngIf="!device.mcuType">
+            <p>Please, select a template for esp_config:
+              <nz-select nzShowSearch nzAllowClear nzPlaceHolder="Select a template"
+                (ngModelChange)="onConfigurationTemplateChange($event)" [ngModel]="device.description">
+                <nz-option [nzLabel]="opt.name" [nzValue]="opt.value" *ngFor="let opt of deviceTypes">
+                </nz-option>
+              </nz-select>
+            </p>
+          </div>
+          <div *ngIf="device.mcuType">
+            <p>This device is using
+              <nz-tag nzColor="#52b01a">{{device.mcuType}}</nz-tag>
+              template.
+            </p>
+            <p>Tweak your esp_config:</p>
+            {{device.esp_config | json}}
+            <div>
+              <!-- <p *ngFor="let item of device.esp_config | keyvalue ">
+                <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+              </p>
+
+              <h3>In</h3>
+              <p *ngFor="let item of device.esp_config.in | keyvalue ">
+                <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+              </p>
+
+              <h3>Out</h3>
+
+              <p *ngFor="let item of device.esp_config.out | keyvalue ">
+                <b>{{item.key}}</b>: <span>{{item.value | json}}</span>
+              </p> -->
+            </div>
+            <!-- <app-device-editor #deviceEditor [device]="device" (deviceChange)="this.device = $event;">
+            </app-device-editor> -->
+            <nz-divider></nz-divider>
+            <button nz-button nzDanger (click)="removeConfiguration()">Delete esp_config</button>
+          </div>
+        </ng-template>
+      </nz-tab>
+      <nz-tab nzTitle="Charts">
+        <ng-template nz-tab>
+          <app-device-charts [device]="device"></app-device-charts>
+        </ng-template>
+      </nz-tab>
+    </nz-tabset>
+
+
+
+  </div>
+</ng-template>

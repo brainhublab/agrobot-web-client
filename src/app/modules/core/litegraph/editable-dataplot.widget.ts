@@ -31,7 +31,7 @@ export class EditableDataPlotWidget implements IEditableDataPlotWidget {
   constructor(
     public name: string,
     public options = { max: 1, min: 0 },
-    public value = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1, .11, .12],
+    public value = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1, .11, .12, .13, .14, .15, .16, .17, .18, .19, .20, .21, .22],
   ) {
   }
 

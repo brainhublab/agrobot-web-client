@@ -1,7 +1,9 @@
 :host {
   display: block;
   position: relative;
+  overflow: hidden;
   canvas {
+    background-color: #909090;
     display: block;
   }
   .buttons {
@@ -29,14 +31,26 @@
 
     nz-tabset {
       overflow-x: visible;
-    }
-  }
 
-  .controller-list {
-    .controller {
-      padding: 10px;
-      &:hover {
-        opacity: 0.7;
+      .nodes-list {
+        .node {
+          width: 100%;
+          margin: 1px 0;
+          text-align: left;
+
+          .tag {
+            float: right;
+          }
+        }
+      }
+
+      .controller-list {
+        .controller {
+          padding: 10px;
+          &:hover {
+            opacity: 0.7;
+          }
+        }
       }
     }
   }
@@ -73,5 +87,4 @@
   * {
     color: #aaaaaa;
   }
-
 }

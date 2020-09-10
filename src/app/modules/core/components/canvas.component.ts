@@ -1,4 +1,4 @@
-import { LGraph, LGraphCanvas } from 'litegraph.js';
+import { LGraph, LGraphCanvas, LiteGraph } from 'litegraph.js';
 import { Input, HostListener, AfterViewInit } from '@angular/core';
 
 /**
@@ -28,8 +28,14 @@ export abstract class LiteGraphCanvasComponent implements AfterViewInit {
   protected abstract canvasElementID: string;
 
   /**
+   * The canvas size multiplier relative to viewsize
+   */
+  protected canvasSizeMultiplier = 2;
+
+  /**
    * Compoentn and canvas size
    */
+  viewHeight = window.innerHeight - 48;
   @Input() width = 1024;
   @Input() height = 720;
 
@@ -49,8 +55,9 @@ export abstract class LiteGraphCanvasComponent implements AfterViewInit {
    * Update dimensions
    */
   protected recalculateCanvasSize() {
-    this.width = window.innerWidth - 0;
-    this.height = window.innerHeight - 48;
+    this.width = this.canvasSizeMultiplier * (window.innerWidth - 0);
+    this.height = this.canvasSizeMultiplier * (window.innerHeight - 48);
+    this.viewHeight = window.innerHeight - 48;
   }
 
   /**
