@@ -5,7 +5,7 @@
 </p>
 <div align="center">
   <h1>Agrobot webclient</h1>
-  <p>Webclient for hydroponics automation</p>
+  <p>Argobot is a control and data processing system for irritation and hydroponic systems</p>
 </div>
 
 ## ✨ Features / Tech stack
