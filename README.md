@@ -1,8 +1,8 @@
-<p align="center">
+<div align="center">
   <a>
     <img width="230" src="./docs/images/water_level_node.png">
   </a>
-</p>
+</div>
 <div align="center">
   <h1>Agrobot webclient</h1>
   <p>Argobot is a control and data processing system for irritation and hydroponic systems</p>
